@@ -46,7 +46,7 @@ DESCRIPTION
 
     -   Medium Screen Wireframe - [View](https://)
 
-    -   Large Screen Wireframe - [View](https://)
+    -   Large Screen Wireframe - [View](assets/readme/wireframes/large-screen-size.png)
 
 ## Features
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
