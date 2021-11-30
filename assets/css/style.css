@@ -2,6 +2,9 @@
     --header-height: 55px;
     --footer-height: 90px;
     --player-action-bar-height: 4rem;
+
+    --playing-card-width: 80px;
+    --playing-card-height: calc(var(--playing-card-width)*(182/131))
 }
 
 * {
@@ -70,4 +73,21 @@
     justify-content: space-around;
     align-items: center;
     flex-wrap: nowrap;
+}
+
+/* playing-box */
+#betting-area .card-list {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 80%;
+}
+
+#betting-area .playing-card {
+    min-width: calc(var(--playing-card-width) / 4);
+    height: var(--playing-card-height);
+}
+
+/* playing-cards populated images */
+#betting-area .card-list img {
+    width: var(--playing-card-width)
 }

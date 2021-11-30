@@ -15,13 +15,13 @@
     })
 }
 
-function drawCard(count = 1) {
+function drawCards(count = 1) {
     return fetchFromAPI(`${deckID}/draw/?count=${count}`)
     .then(json=>{
         return json;
     })
 }
 
-function returnCard() {
-    return fetchFromAPI(`${deckID}/return/`)
+function returnCards(cardList) {
+    return fetchFromAPI(`${deckID}/return/${cardList?`?cards=${cardList.join(',')}`:''}`)
 }

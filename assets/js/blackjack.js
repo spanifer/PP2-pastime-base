@@ -13,20 +13,27 @@ window.addEventListener('load', async function() {
     }
 
     displayCard()
+
+    returnCards()
 })
 
 async function displayCard() {
-    const response = await drawCard()
+    const response = await drawCards(3)
     console.log(response)
 
-    const cardImageURL = response.cards[0].image
+    const cardsWrapper = document.getElementById('betting-area').firstElementChild
 
-    const cardWrapper = document.getElementById('betting-area').firstElementChild.firstElementChild
+    for(const card of response.cards) {
 
-    const cardImg = document.createElement('img')
-    cardImg.src = cardImageURL
-
-    cardWrapper.appendChild(cardImg)
-
-    console.log(await returnCard())
+        const cardImageURL = card.image
+        
+        const cardImg = document.createElement('img')
+        cardImg.src = cardImageURL
+        
+        const cardWrapper = document.createElement('div')
+        cardWrapper.classList.add('playing-card')
+        
+        cardWrapper.appendChild(cardImg)
+        cardsWrapper.appendChild(cardWrapper)
+    }
 }
