@@ -18,21 +18,22 @@ window.addEventListener('load', async function() {
 })
 
 async function displayCard() {
+
     const response = await drawCards(3)
     console.log(response)
 
-    const cardsWrapper = document.getElementById('betting-area').firstElementChild
+    const cardsWrapper = document.getElementById('betting-area').firstElementChild.firstElementChild
 
-    for(const card of response.cards) {
+    for (const card of response.cards) {
 
         const cardImageURL = card.image
-        
+
         const cardImg = document.createElement('img')
         cardImg.src = cardImageURL
-        
+
         const cardWrapper = document.createElement('div')
         cardWrapper.classList.add('playing-card')
-        
+
         cardWrapper.appendChild(cardImg)
         cardsWrapper.appendChild(cardWrapper)
     }
