@@ -1,0 +1,73 @@
+:root {
+    --header-height: 55px;
+    --footer-height: 90px;
+    --player-action-bar-height: 4rem;
+}
+
+* {
+    margin: 0;
+    border: none;
+    padding: 0;
+    /* box-sizing: border-box; */
+}
+
+/* Header style */
+#blackjack > header {
+    position: fixed;
+    width: 100%;
+    height: var(--header-height);
+}
+
+#blackjack > header > * {
+    float: right;
+    line-height: var(--header-height);
+}
+
+/* Footer style */
+#blackjack > footer {
+    position: fixed;
+    width: 100%;
+    height: var(--footer-height);
+    bottom: 0;
+}
+
+/* Main game */
+
+#blackjack > main {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#game-wrapper { 
+    width: 100%;
+    height: 100%;
+    display: grid;
+    /* Refactor to have a fixed table area */
+    grid-template: 
+    "table table" 70%
+    "cash  action" 4rem / 20% 80%;
+    align-content: center;
+}
+
+#table {
+    grid-area: table;
+    display: grid;
+    grid-template-rows: 20% 80%;
+    align-items: center;
+    justify-content: center;
+}
+
+#player-cash {
+    grid-area: cash;
+    text-align: center;
+    line-height: var(--player-action-bar-height);
+}
+
+#player-action {
+    grid-area: action;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: nowrap;
+}

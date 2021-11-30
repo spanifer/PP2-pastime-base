@@ -5,36 +5,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blackjack</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body id="blackjack">
     <header>
-        Burger menu button
+        <i class="fas fa-bars"></i>
     </header>
     <main>
-        Game area
-        <div>
-            Table and animation area
-            <div>
-                Dealer
+        <div id="game-wrapper">
+            <div id="table">
+                <div id="dealer">
+                    Dealer
+                </div>
+                <div id="betting-area">
+                    <div class="betting-box">
+                        <div>cards</div>
+                        <div>bet amount</div>
+                    </div>
+                </div>
             </div>
-            <div>
-                Betting Boxes
+            <div id="player-cash">
+                $$$
             </div>
-        </div>
-        <div>
-            Game info, Only show on menu button press
-        </div>
-        <div>
-            Player decision buttons
-            <span>Hit</span>
-            <span>Stand</span>
-            <span>Double</span>
-            <span>Split</span>
-            <span>Surrender</span>
+            <div id="player-action">
+                <span>Hit</span>
+                <span>Stand</span>
+                <span>Double</span>
+                <span>Split</span>
+                <span>Surrender</span>
+            </div>
         </div>
     </main>
     <footer>
         Social links
     </footer>
+    <script src="https://kit.fontawesome.com/a27400ecfe.js" crossorigin="anonymous"></script>
+    <script src="assets/js/blackjack.js"></script>
 </body>
 </html>
