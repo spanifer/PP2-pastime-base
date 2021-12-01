@@ -11,30 +11,39 @@ window.addEventListener('load', async function() {
             localStorage.setItem('deckID',json.deck_id);
         })
     }
-
-    displayCard()
-
-    returnCards()
 })
 
-async function displayCard() {
-
-    const response = await drawCards(3)
-    console.log(response)
-
-    const cardsWrapper = document.getElementById('betting-area').firstElementChild.firstElementChild
-
-    for (const card of response.cards) {
-
-        const cardImageURL = card.image
-
-        const cardImg = document.createElement('img')
-        cardImg.src = cardImageURL
-
-        const cardWrapper = document.createElement('div')
-        cardWrapper.classList.add('playing-card')
-
-        cardWrapper.appendChild(cardImg)
-        cardsWrapper.appendChild(cardWrapper)
+const gameState = {
+    phase: -1,
+    acceptedPhases: ['betting', 'dealing', 'evaluate', 'conclude'],
+    continuePhase: function () {
+        if (++this.phase > this.acceptedPhases.length) this.phase = 0;
+    },
+    getPhase: function () {
+        return this.acceptedPhases[this.phase]
     }
+}
+
+// allow player to place bets on betting phase
+function loadBettingPhase() {
+    const betBoxes = document.getElementsByClassName('bet')
+    for (const betBox of betBoxes) {
+        betBox.classList.add('allow-bet')
+    }
+}
+
+function unloadBettingPhase() {
+    const betBoxes = document.getElementsByClassName('bet')
+    for (const betBox of betBoxes) {
+        betBox.classList.remove('allow-bet')
+    }
+}
+
+// evaluation phase
+function loadEvaluationPhase() {
+    document.getElementById('player-action').style.visibility = 'visible'
+}
+
+function unloadEvaluationPhase() {
+    document.getElementById('player-action').style.visibility = 'hidden'
 }

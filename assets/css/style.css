@@ -2,6 +2,8 @@
     --header-height: 55px;
     --footer-height: 90px;
     --player-action-bar-height: 4rem;
+    
+    --button-height: 55px;
 
     --playing-card-width: 80px;
     --playing-card-height: calc(var(--playing-card-width)*(182/131))
@@ -73,6 +75,7 @@
     justify-content: space-around;
     align-items: center;
     flex-wrap: nowrap;
+    visibility: hidden;
 }
 
 /* playing-box */
@@ -83,9 +86,18 @@
 
 #betting-area .bet {
     visibility: hidden;
+    text-align: center;
 }
 
-#betting-area .betting-box:hover .bet {
+.bet > div {
+    width: var(--button-height);
+    height: var(--button-height);
+    border-radius: 50%;
+    border: 2px solid black;
+    display: inline-block;
+}
+
+#betting-area .betting-box:hover .allow-bet {
     visibility: visible;
 }
 
