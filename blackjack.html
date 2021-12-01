@@ -15,7 +15,11 @@
         <div id="game-wrapper">
             <div id="table">
                 <div id="dealer">
-                    Dealer
+                    <div class="card-list">
+                        <!--cards-->
+                    </div>
+                    <div class="cards-value"></div>
+                    <button id="start-round">Start</button>
                 </div>
                 <div id="betting-area">
                     <div class="betting-box">
@@ -24,8 +28,8 @@
                         </div>
                         <div class="cards-value"></div>
                         <div class="bet allow-bet">
-                            <div>+</div>
-                            <div>-</div>
+                            <div data-type="add">+</div>
+                            <div data-type="sub">-</div>
                         </div>
                         <div class="pot">
                             <!-- bet amount -->
@@ -37,8 +41,8 @@
                         </div>
                         <div class="cards-value"></div>
                         <div class="bet allow-bet">
-                            <div>+</div>
-                            <div>-</div>
+                            <div data-type="add">+</div>
+                            <div data-type="sub">-</div>
                         </div>
                         <div class="pot">
                             <!-- bet amount -->
@@ -50,8 +54,8 @@
                         </div>
                         <div class="cards-value"></div>
                         <div class="bet allow-bet">
-                            <div>+</div>
-                            <div>-</div>
+                            <div data-type="add">+</div>
+                            <div data-type="sub">-</div>
                         </div>
                         <div class="pot">
                             <!-- bet amount -->

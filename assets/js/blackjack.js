@@ -5,7 +5,7 @@ window.addEventListener('load', async function() {
 
     if (!deckID) {
         // get a new shuffled deck
-        await fetchFromAPI('new/shuffle/?deck_count=1')
+        await getNewDeck()
         .then(json=>{
             deckID = json.deck_id;
             localStorage.setItem('deckID',json.deck_id);
@@ -46,4 +46,16 @@ function loadEvaluationPhase() {
 
 function unloadEvaluationPhase() {
     document.getElementById('player-action').style.visibility = 'hidden'
+}
+
+// betting event listener
+for (const betButtons of document.getElementsByClassName('bet')) {
+    for (const betButton of betButtons.children) {
+        betButton.addEventListener('click', function() {
+            const thisBetBox = this.parentElement.parentElement
+            const thisPot = thisBetBox.getElementsByClassName('pot')[0]
+            console.log(thisPot.innerHTML)
+        })
+        // betButton.addEventListener('pointerdown')
+    }
 }

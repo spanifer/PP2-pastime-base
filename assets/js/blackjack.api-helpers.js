@@ -15,6 +15,10 @@
     })
 }
 
+function getNewDeck(count = 1, shuffle = true) {
+    return fetchFromAPI(`/new/${shuffle?'shuffle/':''}${count?'?count='+count:''}`)
+}
+
 function drawCards(count = 1) {
     return fetchFromAPI(`${deckID}/draw/?count=${count}`)
     .then(json=>{
