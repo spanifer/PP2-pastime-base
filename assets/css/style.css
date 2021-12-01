@@ -76,6 +76,28 @@
 }
 
 /* playing-box */
+#betting-area {
+    display: flex;
+    width: 100vw;
+}
+
+#betting-area .bet {
+    visibility: hidden;
+}
+
+#betting-area .betting-box:hover .bet {
+    visibility: visible;
+}
+
+#betting-area .betting-box:hover {
+    background-color: #aaa;
+}
+
+#betting-area .betting-box {
+    height: 400px;
+    width: 100%;
+}
+
 #betting-area .card-list {
     display: flex;
     flex-wrap: nowrap;
