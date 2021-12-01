@@ -76,6 +76,8 @@ DESCRIPTION
     - GitHub is used to store the projects code after being pushed from Git.
 1. [Balsamiq:](https://balsamiq.com/)
     - Balsamiq was used to create the [wireframes](https://github.com/) during the design process.
+1. [Deck Of Cards API](https://deckofcardsapi.com/)
+    - Deck of cards API is used to get card images and deck info
 
 ## Testing
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
@@ -193,6 +195,8 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 ### Code
 
 -   [MDN Web Docs](https://developer.mozilla.org/)
+-   [Fetch API usage](https://github.com/mdn/fetch-examples/blob/master/fetch-request/index.html)
+-   [JSdoc manual](https://jsdoc.app/tags-param.html)
 
 ### Content
 
