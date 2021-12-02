@@ -21,9 +21,6 @@ function getNewDeck(count = 1, shuffle = true) {
 
 function drawCards(count = 1) {
     return fetchFromAPI(`${deckID}/draw/?count=${count}`)
-    .then(json=>{
-        return json;
-    })
 }
 
 function returnCards(cardList) {

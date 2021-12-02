@@ -53,7 +53,8 @@ function unloadEvaluationPhase() {
     document.getElementById('player-action').style.visibility = 'hidden'
 }
 
-// betting event listener
+// TODO event listeners should invoke game state modifier functions, and those should invoke UI mutation methods
+// set up placing-bet event listeners
 for (const betButtons of document.getElementsByClassName('bet')) {
     for (const betButton of betButtons.children) {
 
@@ -65,9 +66,13 @@ for (const betButtons of document.getElementsByClassName('bet')) {
             isPressed: false
         }
 
-        betButton.addEventListener('pointerdown', mousedownEvHandler.bind(null, closure))
-        betButton.addEventListener('pointerup', mouseupEvHandler.bind(null, closure))
-        betButton.addEventListener('pointerleave', mouseupEvHandler.bind(null, closure))
+        // make sure not to set listeners multiple times
+        if (betButton.dataset.listener !== 'set') {
+            betButton.addEventListener('pointerdown', mousedownEvHandler.bind(null, closure))
+            betButton.addEventListener('pointerup', mouseupEvHandler.bind(null, closure))
+            betButton.addEventListener('pointerleave', mouseupEvHandler.bind(null, closure))
+        }
+        betButton.dataset.listener = 'set'
     }
 }
 
@@ -75,6 +80,7 @@ function mousedownEvHandler (closure) {
     if (!parseInt(closure.pot.innerText)) closure.pot.innerText = 1;
     closure.isPressed = true;
     closure.changeCount = 1;
+    // call recursively until mouseup event changes the isPressed variable
     function executeOperation() {
         if (closure.isPressed) {
             betOperation(closure)
