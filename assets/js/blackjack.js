@@ -15,7 +15,8 @@ window.addEventListener('load', async function() {
 
 // Game rules
 const MAX_BET = 100,
-    BET_OPERATION_INTERVAL = 100;
+    BET_OPERATION_INTERVAL = 100,
+    BET_INTERVAL_FREQUENCY = 8;
 
 const gameState = {
     phase: -1,
@@ -73,9 +74,11 @@ for (const betButtons of document.getElementsByClassName('bet')) {
 function mousedownEvHandler (closure) {
     if (!parseInt(closure.pot.innerText)) closure.pot.innerText = 1;
     closure.isPressed = true;
+    closure.changeCount = 1;
     function executeOperation() {
         if (closure.isPressed) {
             betOperation(closure)
+            closure.changeCount++
             setTimeout(executeOperation,BET_OPERATION_INTERVAL)
         }
     }
@@ -85,20 +88,25 @@ function mousedownEvHandler (closure) {
 function mouseupEvHandler (closure) {
     if (!parseInt(closure.pot.innerText)) closure.pot.innerText = '';
     closure.isPressed = false;
+    closure.changeCount = null;
 }
 
-function betOperation ({pot, betButton:{dataset:{type}}}) {
+function betOperation ({pot, betButton:{dataset:{type}}, changeCount:count}) {
     let value = parseInt(pot.innerText)
     if (!value && value !== 0) {
         console.error('Something went terribly wrong with bet value: ', value)
         value = 0;
     }
     switch (type) {
-        case 'add': if (value >= MAX_BET) break; 
-            pot.innerText = ++value;
+        case 'add':
+            value += Math.ceil(count/BET_INTERVAL_FREQUENCY)
+            if (value >= MAX_BET) {pot.innerText = MAX_BET; break;}
+            pot.innerText = value
             break;
-        case 'sub': if (value <= 0) break;
-            pot.innerText = --value;
+        case 'sub':
+            value -= Math.ceil(count/BET_INTERVAL_FREQUENCY)
+            if (value <= 0) {pot.innerText = 0; break;}
+            pot.innerText = value
             break;
         default: throw new Error('No such operation.')
     }
