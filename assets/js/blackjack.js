@@ -28,14 +28,26 @@ const gameState = {
     getPhase: function () {
         return this.acceptedPhases[this.phase]
     },
-    betBoxes : new Set(),
-    advanceBettingPhase : function () {
+    betBoxes: new Map(),
+    // IIFE       👇
+    dealerBox: function (){
+        const map = new Map()
+        map.set(document.getElementById('dealer'),[])
+        return map
+    }(),
+    advanceBettingPhase: function () {
         if (! this.betBoxes.size) throw new Error('Should not be able to advance betting phase')
         this.continuePhase()
         unloadBettingPhase()
         loadDealingPhase()
     },
-
+    initDealingPhase: function () {
+        drawCards(gameState.betBoxes.size * 2 + 2)
+        .then(apiResponse => {
+            if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
+            dealCards(apiResponse)
+        })
+    }
 }
 
 // allow player to place bets on betting phase
@@ -54,12 +66,39 @@ function unloadBettingPhase() {
 }
 
 function loadDealingPhase() {
-    drawCards(gameState.betBoxes.size * 2 + 2)
+    document.getElementById('dealer-message').style.visibility = 'hidden'
+    gameState.initDealingPhase()
+}
+
+function dealCards(docAPI) {
     // The dealer deals from their left ("first base") to their far right ("third base")
-    .then(apiResponse => {
-        if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ', apiResponse)
-        // dealCards()
+    const betBoxes = [...document.getElementsByClassName('betting-box')].reverse().map(betBox=>{
+        if (gameState.betBoxes.has(betBox)) return betBox
     })
+    // Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single
+    // card to the dealer, followed by an additional card to each of the positions in play.
+    betBoxes.push(document.getElementById('dealer'))
+
+    for (const [i,card] of docAPI.cards.entries()) {
+        const betBox = betBoxes[i % betBoxes.length]
+        const img = document.createElement('img')
+        img.src = card.image
+        betBox.getElementsByClassName('card-list')[0].appendChild(img)
+
+        let {code,suit,value} = card;
+        let boxState
+        if (boxState = gameState.betBoxes.get(betBox)) 
+            gameState.betBoxes.set(betBox, [...boxState, {
+                code, suit, value
+            }])
+        else if (boxState = gameState.dealerBox.get(betBox)) {
+            gameState.dealerBox.set(betBox, [...boxState, {
+                code, suit, value
+            }])
+        } else {
+            throw new TypeError('Bet box does not exist!')
+        }
+    }
 }
 
 // evaluation phase
@@ -121,7 +160,7 @@ function mouseupEvHandler (closure) {
     closure.isPressed = false;
     closure.recursionCount = null;
     if (PLAYER.getPot(closure.betBox)) {
-        gameState.betBoxes.add(closure.betBox)
+        gameState.betBoxes.set(closure.betBox, [])
     } else {
         gameState.betBoxes.delete(closure.betBox)
     }
@@ -152,7 +191,6 @@ function betOperation (closure) {
                 pot.innerText = ''
                 PLAYER.removePot(betBox)
                 closure.isPressed = false
-                break
             } else {
                 PLAYER.addPot(betBox, value)
                 pot.innerText = value
