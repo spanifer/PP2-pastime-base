@@ -67,14 +67,14 @@ function unloadBettingPhase() {
 
 function loadDealingPhase() {
     document.getElementById('dealer-message').style.visibility = 'hidden'
+    document.getElementById('start-button').style.visibility = 'hidden'
     gameState.initDealingPhase()
 }
 
 function dealCards(docAPI) {
     // The dealer deals from their left ("first base") to their far right ("third base")
-    const betBoxes = [...document.getElementsByClassName('betting-box')].reverse().map(betBox=>{
-        if (gameState.betBoxes.has(betBox)) return betBox
-    })
+    const betBoxes = [...document.getElementsByClassName('betting-box')]
+    .reverse().filter(betBox=>gameState.betBoxes.has(betBox))
     // Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single
     // card to the dealer, followed by an additional card to each of the positions in play.
     betBoxes.push(document.getElementById('dealer'))
