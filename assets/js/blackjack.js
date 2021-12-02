@@ -23,26 +23,43 @@ const gameState = {
     phase: -1,
     acceptedPhases: ['betting', 'dealing', 'evaluate', 'conclude'],
     continuePhase: function () {
-        if (++this.phase > this.acceptedPhases.length) this.phase = 0;
+        if (++this.phase >= this.acceptedPhases.length) this.phase = 0;
     },
     getPhase: function () {
         return this.acceptedPhases[this.phase]
-    }
+    },
+    betBoxes : new Set(),
+    advanceBettingPhase : function () {
+        if (! this.betBoxes.size) throw new Error('Should not be able to advance betting phase')
+        this.continuePhase()
+        unloadBettingPhase()
+        loadDealingPhase()
+    },
+
 }
 
 // allow player to place bets on betting phase
 function loadBettingPhase() {
-    const betBoxes = document.getElementsByClassName('bet')
-    for (const betBox of betBoxes) {
-        betBox.classList.add('allow-bet')
+    const betButtons = document.getElementsByClassName('bet')
+    for (const buttonsWrapper of betButtons) {
+        buttonsWrapper.classList.add('allow-bet')
     }
 }
 
 function unloadBettingPhase() {
-    const betBoxes = document.getElementsByClassName('bet')
-    for (const betBox of betBoxes) {
-        betBox.classList.remove('allow-bet')
+    const betButtons = document.getElementsByClassName('bet')
+    for (const buttonsWrapper of betButtons) {
+        buttonsWrapper.classList.remove('allow-bet')
     }
+}
+
+function loadDealingPhase() {
+    drawCards(gameState.betBoxes.size * 2 + 2)
+    // The dealer deals from their left ("first base") to their far right ("third base")
+    .then(apiResponse => {
+        if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ', apiResponse)
+        // dealCards()
+    })
 }
 
 // evaluation phase
@@ -103,6 +120,11 @@ function mousedownEvHandler (closure) {
 function mouseupEvHandler (closure) {
     closure.isPressed = false;
     closure.recursionCount = null;
+    if (PLAYER.getPot(closure.betBox)) {
+        gameState.betBoxes.add(closure.betBox)
+    } else {
+        gameState.betBoxes.delete(closure.betBox)
+    }
 }
 
 function betOperation (closure) {
