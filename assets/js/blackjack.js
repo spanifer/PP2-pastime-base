@@ -64,9 +64,9 @@ for (const betButtons of document.getElementsByClassName('bet')) {
             isPressed: false
         }
 
-        betButton.addEventListener('mousedown', mousedownEvHandler.bind(null, closure))
-        betButton.addEventListener('mouseup', mouseupEvHandler.bind(null, closure))
-        betButton.addEventListener('mouseleave', mouseupEvHandler.bind(null, closure))
+        betButton.addEventListener('pointerdown', mousedownEvHandler.bind(null, closure))
+        betButton.addEventListener('pointerup', mouseupEvHandler.bind(null, closure))
+        betButton.addEventListener('pointerleave', mouseupEvHandler.bind(null, closure))
     }
 }
 
