@@ -75,11 +75,7 @@ function mousedownEvHandler (closure) {
     closure.isPressed = true;
     function executeOperation() {
         if (closure.isPressed) {
-            switch (closure.betButton.dataset.type) {
-                case 'add': console.log('add'); break;
-                case 'sub': console.log('sub'); break;
-                default: throw new Error('No such operation.')
-            }
+            betOperation(closure)
             setTimeout(executeOperation,BET_OPERATION_INTERVAL)
         }
     }
@@ -90,3 +86,20 @@ function mouseupEvHandler (closure) {
     if (!parseInt(closure.pot.innerText)) closure.pot.innerText = '';
     closure.isPressed = false;
 }
+
+function betOperation ({pot, betButton:{dataset:{type}}}) {
+    let value = parseInt(pot.innerText)
+    if (!value && value !== 0) {
+        console.error('Something went terribly wrong with bet value: ', value)
+        value = 0;
+    }
+    switch (type) {
+        case 'add': if (value >= MAX_BET) break; 
+            pot.innerText = ++value;
+            break;
+        case 'sub': if (value <= 0) break;
+            pot.innerText = --value;
+            break;
+        default: throw new Error('No such operation.')
+    }
+} 
