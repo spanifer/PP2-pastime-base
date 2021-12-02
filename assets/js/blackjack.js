@@ -13,6 +13,10 @@ window.addEventListener('load', async function() {
     }
 })
 
+// Game rules
+const MAX_BET = 100,
+    BET_OPERATION_INTERVAL = 100;
+
 const gameState = {
     phase: -1,
     acceptedPhases: ['betting', 'dealing', 'evaluate', 'conclude'],
@@ -51,11 +55,38 @@ function unloadEvaluationPhase() {
 // betting event listener
 for (const betButtons of document.getElementsByClassName('bet')) {
     for (const betButton of betButtons.children) {
-        betButton.addEventListener('click', function() {
-            const thisBetBox = this.parentElement.parentElement
-            const thisPot = thisBetBox.getElementsByClassName('pot')[0]
-            console.log(thisPot.innerHTML)
-        })
-        // betButton.addEventListener('pointerdown')
+
+        const betBox = betButton.parentElement.parentElement
+        const pot = betBox.getElementsByClassName('pot')[0]
+        const closure = {
+            pot: pot,
+            betButton: betButton,
+            isPressed: false
+        }
+
+        betButton.addEventListener('mousedown', mousedownEvHandler.bind(null, closure))
+        betButton.addEventListener('mouseup', mouseupEvHandler.bind(null, closure))
+        betButton.addEventListener('mouseleave', mouseupEvHandler.bind(null, closure))
     }
+}
+
+function mousedownEvHandler (closure) {
+    if (!parseInt(closure.pot.innerText)) closure.pot.innerText = 1;
+    closure.isPressed = true;
+    function executeOperation() {
+        if (closure.isPressed) {
+            switch (closure.betButton.dataset.type) {
+                case 'add': console.log('add'); break;
+                case 'sub': console.log('sub'); break;
+                default: throw new Error('No such operation.')
+            }
+            setTimeout(executeOperation,BET_OPERATION_INTERVAL)
+        }
+    }
+    executeOperation()
+}
+
+function mouseupEvHandler (closure) {
+    if (!parseInt(closure.pot.innerText)) closure.pot.innerText = '';
+    closure.isPressed = false;
 }
