@@ -15,7 +15,7 @@ function boxTypeCheck (bettingBox) {
 
 Player.prototype.getPot = function (bettingBox) {
     boxTypeCheck(bettingBox)
-    this.potList.get(bettingBox)
+    return this.potList.get(bettingBox)
 }
 
 Player.prototype.addPot = function (bettingBox, potValue) {
