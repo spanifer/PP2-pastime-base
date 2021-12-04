@@ -16,7 +16,8 @@ window.addEventListener('load', async function() {
 // Game rules
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
-    BET_INTERVAL_FREQUENCY = 8
+    BET_INTERVAL_FREQUENCY = 8,
+    BLACKJACK = 21
 
 const gameState = {
     phase: -1,
@@ -28,23 +29,23 @@ const gameState = {
     getPhase: function () {
         return this.acceptedPhases[this.phase]
     },
-    betBoxes: new Map(),
-    // IIFE       👇
-    dealerBox: function (){
+    resetBetBoxes: function (){
         const map = new Map()
         map.set(document.getElementById('dealer'),[])
-        return map
-    }(),
+        this.betBoxes = map
+    },
 }
+
+gameState.resetBetBoxes()
 
 const gameProperties = {
     // This is a list of card values that the api will return for each card
     cardNameValues: ["ACE","2","3","4","5","6","7","8","9","10","JACK","QUEEN","KING"],
+    highCards: gameProperties.cardNameValues.slice(10),
     getCardGameValue: function(cardName) {
         let val;
         if (val = parseInt(cardName)) return val;
-        const tens = gameState.cardNameValues.slice(10)
-        if (tens.includes(cardName)) return 10;
+        if (this.highCards.includes(cardName)) return 10;
         else return [1,11]
     },
 }
@@ -52,7 +53,7 @@ const gameProperties = {
 // Game Course methods and initiators
 // __________________________________
 function advanceBettingPhase() {
-    if (! gameState.betBoxes.size) throw new Error('Should not be able to advance betting phase')
+    if (gameState.betBoxes.size < 2) throw new Error('Should not be able to advance betting phase')
     gameState.continuePhase()
     unloadBettingPhase()
     loadDealingPhase()
@@ -60,7 +61,7 @@ function advanceBettingPhase() {
 }
 
 function initDealingPhase() {
-    drawCards(gameState.betBoxes.size * 2 + 2)
+    drawCards(gameState.betBoxes.size * 2)
     .then(apiResponse => {
         if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
         dealCards(apiResponse)
@@ -87,14 +88,37 @@ function dealCards(docAPI) {
             gameState.betBoxes.set(betBox, [...boxState, {
                 code, suit, value
             }])
-        else if (boxState = gameState.dealerBox.get(betBox)) {
-            gameState.dealerBox.set(betBox, [...boxState, {
-                code, suit, value
-            }])
-        } else {
+        else
             throw new TypeError('Bet box does not exist!')
-        }
+
+        updateCardsGameValue(betBox)
     }
+}
+
+/**
+ * Temporarily this function handles the dealt cards value evaluation as well
+ * @param {HTMLDivElement} betBox - with the 'betting-box' class name
+ * @note ace value is either 1 or 11 according to the player choice, so it can be calculated automatically, player cannot just decide hes bust
+ * @todo divide and refactor according the method affiliation
+ */
+function updateCardsGameValue(betBox) {
+    const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
+    const cards = gameState.betBoxes.get(betBox)
+
+    const {f:fixedValues, a:aces} = cards
+        .reduce((p,c)=>{
+            const value = gameProperties.getCardGameValue(c.value)
+            if (typeof value === 'number') p.f += value
+            else p.a.push(c)
+            return p
+        },{f:0,a:[]})
+
+    let cardsValues = fixedValues
+
+    aces.forEach(ace=>cardsValues += 
+        aces.length-1+11+cardsValues > BLACKJACK ? 1 : 11)
+
+    cardsValueWrapper.innerText = cardsValues
 }
 // _________________________________
 
