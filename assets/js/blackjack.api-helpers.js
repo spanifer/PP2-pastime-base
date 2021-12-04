@@ -1,5 +1,6 @@
 /**
  * @param {string} path - API specific URL path
+ * @link https://deckofcardsapi.com/
  */
  function fetchFromAPI (path) {
     const baseURL = 'https://deckofcardsapi.com/api/deck/'
@@ -21,6 +22,16 @@ function getNewDeck(count = 1, shuffle = true) {
 
 function drawCards(count = 1) {
     return fetchFromAPI(`${deckID}/draw/?count=${count}`)
+}
+
+/**
+ * 
+ * @param {Boolean} [remaining=true] - Adding the remaining=true parameter will only shuffle those cards
+ * remaining in the main stack, leaving any piles or drawn cards alone.
+ * @link https://deckofcardsapi.com/#reshuffle
+ */
+function shuffleDeck(remaining = true) {
+    fetchFromAPI(`${deckID}/shuffle/${remaining?'?remaining=true':''}`)
 }
 
 function returnCards(cardList) {
