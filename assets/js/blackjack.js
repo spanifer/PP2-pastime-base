@@ -16,12 +16,12 @@ window.addEventListener('load', async function() {
 // Game rules
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
-    BET_INTERVAL_FREQUENCY = 8,
-    PLAYER = new Player({cash:200})
+    BET_INTERVAL_FREQUENCY = 8
 
 const gameState = {
     phase: -1,
     acceptedPhases: ['betting', 'dealing', 'evaluate', 'conclude'],
+    player : new Player({cash:250}),
     continuePhase: function () {
         if (++this.phase >= this.acceptedPhases.length) this.phase = 0;
     },
@@ -35,40 +35,36 @@ const gameState = {
         map.set(document.getElementById('dealer'),[])
         return map
     }(),
-    advanceBettingPhase: function () {
-        if (! this.betBoxes.size) throw new Error('Should not be able to advance betting phase')
-        this.continuePhase()
-        unloadBettingPhase()
-        loadDealingPhase()
+}
+
+const gameProperties = {
+    // This is a list of card values that the api will return for each card
+    cardNameValues: ["ACE","2","3","4","5","6","7","8","9","10","JACK","QUEEN","KING"],
+    getCardGameValue: function(cardName) {
+        let val;
+        if (val = parseInt(cardName)) return val;
+        const tens = gameState.cardNameValues.slice(10)
+        if (tens.includes(cardName)) return 10;
+        else return [1,11]
     },
-    initDealingPhase: function () {
-        drawCards(gameState.betBoxes.size * 2 + 2)
-        .then(apiResponse => {
-            if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
-            dealCards(apiResponse)
-        })
-    }
 }
 
-// allow player to place bets on betting phase
-function loadBettingPhase() {
-    const betButtons = document.getElementsByClassName('bet')
-    for (const buttonsWrapper of betButtons) {
-        buttonsWrapper.classList.add('allow-bet')
-    }
+// Game Course methods and initiators
+// __________________________________
+function advanceBettingPhase() {
+    if (! gameState.betBoxes.size) throw new Error('Should not be able to advance betting phase')
+    gameState.continuePhase()
+    unloadBettingPhase()
+    loadDealingPhase()
+    initDealingPhase()
 }
 
-function unloadBettingPhase() {
-    const betButtons = document.getElementsByClassName('bet')
-    for (const buttonsWrapper of betButtons) {
-        buttonsWrapper.classList.remove('allow-bet')
-    }
-}
-
-function loadDealingPhase() {
-    document.getElementById('dealer-message').style.visibility = 'hidden'
-    document.getElementById('start-button').style.visibility = 'hidden'
-    gameState.initDealingPhase()
+function initDealingPhase() {
+    drawCards(gameState.betBoxes.size * 2 + 2)
+    .then(apiResponse => {
+        if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
+        dealCards(apiResponse)
+    })
 }
 
 function dealCards(docAPI) {
@@ -100,6 +96,30 @@ function dealCards(docAPI) {
         }
     }
 }
+// _________________________________
+
+// Game UI modifiers
+// _________________________________
+// allow player to place bets on betting phase
+function loadBettingPhase() {
+    const betButtons = document.getElementsByClassName('bet')
+    for (const buttonsWrapper of betButtons) {
+        buttonsWrapper.classList.add('allow-bet')
+    }
+}
+// disable bets
+function unloadBettingPhase() {
+    const betButtons = document.getElementsByClassName('bet')
+    for (const buttonsWrapper of betButtons) {
+        buttonsWrapper.classList.remove('allow-bet')
+    }
+}
+
+function loadDealingPhase() {
+    document.getElementById('dealer-message').style.visibility = 'hidden'
+    document.getElementById('start-button').style.visibility = 'hidden'
+}
+
 
 // evaluation phase
 function loadEvaluationPhase() {
@@ -135,10 +155,9 @@ for (const betButtons of document.getElementsByClassName('bet')) {
 }
 
 function mousedownEvHandler (closure) {
-    // if (!parseInt(closure.pot.innerText)) closure.pot.innerText = 1;
     let potValue, {betBox} = closure
-    if (!(potValue = PLAYER.getPot(betBox))) {
-        PLAYER.addPot(betBox, 0)
+    if (!(potValue = gameState.player.getPot(betBox))) {
+        gameState.player.addPot(betBox, 0)
         potValue = 0;
     }
 
@@ -159,7 +178,7 @@ function mousedownEvHandler (closure) {
 function mouseupEvHandler (closure) {
     closure.isPressed = false;
     closure.recursionCount = null;
-    if (PLAYER.getPot(closure.betBox)) {
+    if (gameState.player.getPot(closure.betBox)) {
         gameState.betBoxes.set(closure.betBox, [])
     } else {
         gameState.betBoxes.delete(closure.betBox)
@@ -168,7 +187,7 @@ function mouseupEvHandler (closure) {
 
 function betOperation (closure) {
     let {betBox, pot, betButton:{dataset:{type}}, recursionCount:count} = closure
-    let value = PLAYER.getPot(betBox)
+    let value = gameState.player.getPot(betBox)
     if (!value && value !== 0) {
         console.error('Something went terribly wrong with bet value: ', value)
         value = 0;
@@ -178,10 +197,10 @@ function betOperation (closure) {
             value += Math.ceil(count/BET_INTERVAL_FREQUENCY)
             if (value >= MAX_BET) {
                 pot.innerText = MAX_BET
-                PLAYER.addPot(betBox, MAX_BET)
+                gameState.player.addPot(betBox, MAX_BET)
                 closure.isPressed = false
             } else {
-                PLAYER.addPot(betBox, value)
+                gameState.player.addPot(betBox, value)
                 pot.innerText = value
             }
             break
@@ -189,10 +208,10 @@ function betOperation (closure) {
             value -= Math.ceil(count/BET_INTERVAL_FREQUENCY)
             if (value <= 0) {
                 pot.innerText = ''
-                PLAYER.removePot(betBox)
+                gameState.player.removePot(betBox)
                 closure.isPressed = false
             } else {
-                PLAYER.addPot(betBox, value)
+                gameState.player.addPot(betBox, value)
                 pot.innerText = value
             }
             break
