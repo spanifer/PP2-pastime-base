@@ -195,15 +195,11 @@ function handlePlayerAction(ev) {
         console.error('Miss clicked action')
         return
     }
-    action[ev.target.id](()=>{
-        resetPlayerActions()
-        runEvaluation()
-    })
-    console.log('should remove unused event listeners')
+    action[ev.target.id](ev)
 }
 
 const action = {
-    hit: function(cb){
+    hit: function(){
         drawCards().then(resp=>{
             const card = resp.cards[0]
             const betBox = gameState.currentBetBox.value
@@ -212,12 +208,50 @@ const action = {
             addCardImage(betBox, card)
             boxState.push(card)
             updateCardsGameValue(betBox)
-        }).then(cb)
+
+            resetPlayerActions()
+            runEvaluation()
+        })
     },
-    stand: function(cb){},
-    double: function(cb){},
-    split: function(cb){},
-    surrender: function(cb){}
+    stand: function(){
+        resetPlayerActions()
+        selectNextBox()
+    },
+    double: function(){
+        const betBox = gameState.currentBetBox.value
+        const potValue = gameState.player.getPot(betBox)
+        gameState.player.addToPot(betBox, potValue)
+
+        drawCards().then(resp=>{
+            const card = resp.cards[0]
+            const boxState = gameState.betBoxes.get(betBox)
+
+            addCardImage(betBox, card)
+            boxState.push(card)
+            updateCardsGameValue(betBox)
+
+            resetPlayerActions()
+            selectNextBox()
+        })
+    },
+    split: function(ev){
+        ev.target.innerText = 'Feature not implemented'
+        setTimeout(()=>{
+            ev.target.style.visibility = 'hidden'
+            ev.target.innerText = 'Split'
+        },DEALER_MSG_TIMEOUT)
+    },
+    surrender: function(){
+        const betBox = gameState.currentBetBox.value
+        const potValue = gameState.player.getPot(betBox)
+        gameState.player.addToPot(betBox, -Math.floor(potValue / 2))
+
+        betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox)
+        document.getElementById('player-cash').innerText = gameState.player.cash
+
+        resetPlayerActions()
+        selectNextBox()
+    }
 }
 
 /**
@@ -237,6 +271,8 @@ function evaluateBox(betBox) {
         if (isFirstAction) {
             if (thisBox.cards[0].value !== thisBox.cards[1].value)
                 playerActions.splice(playerActions.indexOf('split'),1)
+            if (gameState.player.cash / gameState.player.getPot(betBox) < 2)
+                playerActions.splice(playerActions.indexOf('double'),1)
             return playerActions
         } else 
             return playerActions.slice(0,2)
