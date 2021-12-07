@@ -36,12 +36,13 @@ const gameState = {
     },
 }
 
+// first element in the list is always the dealer box
 gameState.resetBetBoxes()
 
 const gameProperties = {
     // This is a list of card values that the api will return for each card
     cardNameValues: ["ACE","2","3","4","5","6","7","8","9","10","JACK","QUEEN","KING"],
-    highCards: gameProperties.cardNameValues.slice(10),
+    highCards: ["JACK","QUEEN","KING"],
     getCardGameValue: function(cardName) {
         let val;
         if (val = parseInt(cardName)) return val;
@@ -91,35 +92,36 @@ function dealCards(docAPI) {
         else
             throw new TypeError('Bet box does not exist!')
 
-        updateCardsGameValue(betBox)
+        updateCardsGameValue(betBox, evaluateCardsIn(betBox))
     }
 }
 
 /**
- * Temporarily this function handles the dealt cards value evaluation as well
- * @param {HTMLDivElement} betBox - with the 'betting-box' class name
- * @note ace value is either 1 or 11 according to the player choice, so it can be calculated automatically, player cannot just decide hes bust
- * @todo divide and refactor according the method affiliation
+ * 
+ * @param {HTMLDivElement} betBox 
+ * @returns {Number} cards game value
  */
-function updateCardsGameValue(betBox) {
-    const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
+function evaluateCardsIn(betBox) {
     const cards = gameState.betBoxes.get(betBox)
 
-    const {f:fixedValues, a:aces} = cards
-        .reduce((p,c)=>{
-            const value = gameProperties.getCardGameValue(c.value)
-            if (typeof value === 'number') p.f += value
-            else p.a.push(c)
-            return p
-        },{f:0,a:[]})
+    // reduce cards to an object where aces are sorted separately
+    const {fixedValue, aces} = cards
+        .reduce((sortedCards,card)=>{
+            const value = gameProperties.getCardGameValue(card.value)
+            if (typeof value === 'number') sortedCards.fixedValue += value
+            else sortedCards.aces.push(card)
+            return sortedCards
+        },{fixedValue:0,aces:[]})
 
-    let cardsValues = fixedValues
+    let cardsValue = fixedValue
+    
+    // only add high ace value if it is not over BLACKJACK value
+    aces.forEach(ace=>cardsValue += 
+        aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
 
-    aces.forEach(ace=>cardsValues += 
-        aces.length-1+11+cardsValues > BLACKJACK ? 1 : 11)
-
-    cardsValueWrapper.innerText = cardsValues
+    return cardsValue
 }
+
 // _________________________________
 
 // Game UI modifiers
@@ -144,6 +146,10 @@ function loadDealingPhase() {
     document.getElementById('start-button').style.visibility = 'hidden'
 }
 
+function updateCardsGameValue(betBox, cardsValue) {
+    const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
+    cardsValueWrapper.innerText = cardsValue
+}
 
 // evaluation phase
 function loadEvaluationPhase() {
@@ -153,6 +159,7 @@ function loadEvaluationPhase() {
 function unloadEvaluationPhase() {
     document.getElementById('player-action').style.visibility = 'hidden'
 }
+// _________________________________
 
 // TODO event listeners should invoke game state modifier functions, and those should invoke UI mutation methods
 // set up placing-bet event listeners
