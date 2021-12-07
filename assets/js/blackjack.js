@@ -31,13 +31,46 @@ const gameState = {
     },
     resetBetBoxes: function (){
         const map = new Map()
-        map.set(document.getElementById('dealer'),[])
+        map.set(document.getElementById('dealer'), new Cards())
         this.betBoxes = map
     },
 }
 
 // first element in the list is always the dealer box
 gameState.resetBetBoxes()
+
+function Cards () {
+    this.cards = []
+}
+
+Cards.prototype.push = function (card) {
+    this.cards.push(card)
+}
+
+Cards.prototype.addCard = function () {
+    drawCards(1).then(resp=>{
+        this.cards.push(resp.cards[0])
+    })
+}
+
+Cards.prototype.gameValue = function () {
+    // reduce cards to an object where card values are summed and aces are sorted separately
+    const {fixedValue, aces} = this.cards
+    .reduce((sortedCards,card)=>{
+        const value = gameProperties.getCardGameValue(card.value)
+        if (typeof value === 'number') sortedCards.fixedValue += value
+        else sortedCards.aces.push(card)
+        return sortedCards
+    },{fixedValue:0,aces:[]})
+    
+    let cardsValue = fixedValue
+    
+    // only add high ace value if it is not over BLACKJACK value
+    aces.forEach(ace=>cardsValue += 
+        aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
+        
+    return cardsValue
+}
 
 const gameProperties = {
     // This is a list of card values that the api will return for each card
@@ -88,43 +121,14 @@ function dealCards(docAPI) {
         img.src = card.image
         betBox.getElementsByClassName('card-list')[0].appendChild(img)
         
-        let {code,suit,value} = card;
         let boxState
         if (boxState = gameState.betBoxes.get(betBox)) 
-        gameState.betBoxes.set(betBox, [...boxState, {
-            code, suit, value
-        }])
+            boxState.push(card)
         else
         throw new TypeError('Bet box does not exist!')
         
-        updateCardsGameValue(betBox, evaluateCardsIn(betBox))
+        updateCardsGameValue(betBox)
     }
-}
-
-/**
- * 
- * @param {HTMLDivElement} betBox 
- * @returns {Number} cards game value
- */
-function evaluateCardsIn(betBox) {
-    const cards = gameState.betBoxes.get(betBox)
-    
-    // reduce cards to an object where card values are summed and aces are sorted separately
-    const {fixedValue, aces} = cards
-    .reduce((sortedCards,card)=>{
-        const value = gameProperties.getCardGameValue(card.value)
-        if (typeof value === 'number') sortedCards.fixedValue += value
-        else sortedCards.aces.push(card)
-        return sortedCards
-    },{fixedValue:0,aces:[]})
-    
-    let cardsValue = fixedValue
-    
-    // only add high ace value if it is not over BLACKJACK value
-    aces.forEach(ace=>cardsValue += 
-        aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
-        
-        return cardsValue
 }
     
 function initEvaluationPhase() {
@@ -161,12 +165,12 @@ function unloadBettingPhase() {
 
 function loadDealingPhase() {
     document.getElementById('dealer-message').style.visibility = 'hidden'
-document.getElementById('start-button').style.visibility = 'hidden'
+    document.getElementById('start-button').style.visibility = 'hidden'
 }
 
-function updateCardsGameValue(betBox, cardsValue) {
+function updateCardsGameValue(betBox) {
     const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
-    cardsValueWrapper.innerText = cardsValue
+    cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).gameValue()
 }
 
 // evaluation phase
@@ -228,7 +232,7 @@ function mouseupEvHandler (closure) {
     closure.isPressed = false;
     closure.recursionCount = null;
     if (gameState.player.getPot(closure.betBox)) {
-        gameState.betBoxes.set(closure.betBox, [])
+        gameState.betBoxes.set(closure.betBox, new Cards())
     } else {
         gameState.betBoxes.delete(closure.betBox)
     }
