@@ -66,32 +66,37 @@ function initDealingPhase() {
     .then(apiResponse => {
         if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
         dealCards(apiResponse)
+        initEvaluationPhase()
     })
+}
+
+function getPlayBoxesDirection() {
+    return [...document.getElementsByClassName('betting-box')]
+    .reverse().filter(betBox=>gameState.betBoxes.has(betBox))
 }
 
 function dealCards(docAPI) {
     // The dealer deals from their left ("first base") to their far right ("third base")
-    const betBoxes = [...document.getElementsByClassName('betting-box')]
-    .reverse().filter(betBox=>gameState.betBoxes.has(betBox))
+    const betBoxes = getPlayBoxesDirection()
     // Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single
     // card to the dealer, followed by an additional card to each of the positions in play.
     betBoxes.push(document.getElementById('dealer'))
-
+    
     for (const [i,card] of docAPI.cards.entries()) {
         const betBox = betBoxes[i % betBoxes.length]
         const img = document.createElement('img')
         img.src = card.image
         betBox.getElementsByClassName('card-list')[0].appendChild(img)
-
+        
         let {code,suit,value} = card;
         let boxState
         if (boxState = gameState.betBoxes.get(betBox)) 
-            gameState.betBoxes.set(betBox, [...boxState, {
-                code, suit, value
-            }])
+        gameState.betBoxes.set(betBox, [...boxState, {
+            code, suit, value
+        }])
         else
-            throw new TypeError('Bet box does not exist!')
-
+        throw new TypeError('Bet box does not exist!')
+        
         updateCardsGameValue(betBox, evaluateCardsIn(betBox))
     }
 }
@@ -103,25 +108,38 @@ function dealCards(docAPI) {
  */
 function evaluateCardsIn(betBox) {
     const cards = gameState.betBoxes.get(betBox)
-
-    // reduce cards to an object where aces are sorted separately
+    
+    // reduce cards to an object where card values are summed and aces are sorted separately
     const {fixedValue, aces} = cards
-        .reduce((sortedCards,card)=>{
-            const value = gameProperties.getCardGameValue(card.value)
-            if (typeof value === 'number') sortedCards.fixedValue += value
-            else sortedCards.aces.push(card)
-            return sortedCards
-        },{fixedValue:0,aces:[]})
-
+    .reduce((sortedCards,card)=>{
+        const value = gameProperties.getCardGameValue(card.value)
+        if (typeof value === 'number') sortedCards.fixedValue += value
+        else sortedCards.aces.push(card)
+        return sortedCards
+    },{fixedValue:0,aces:[]})
+    
     let cardsValue = fixedValue
     
     // only add high ace value if it is not over BLACKJACK value
     aces.forEach(ace=>cardsValue += 
         aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
-
-    return cardsValue
+        
+        return cardsValue
 }
-
+    
+function initEvaluationPhase() {
+    loadEvaluationPhase()
+    gameState.continuePhase()
+    const betBoxes = getPlayBoxesDirection()
+    for (const betBox of betBoxes) {
+      // start play
+        // highlight current play area
+        // find and show available player actions
+        // wait for player input
+        // handle action
+        // repeat until bust/blackjack/surrender
+    }
+}
 // _________________________________
 
 // Game UI modifiers
@@ -143,7 +161,7 @@ function unloadBettingPhase() {
 
 function loadDealingPhase() {
     document.getElementById('dealer-message').style.visibility = 'hidden'
-    document.getElementById('start-button').style.visibility = 'hidden'
+document.getElementById('start-button').style.visibility = 'hidden'
 }
 
 function updateCardsGameValue(betBox, cardsValue) {
