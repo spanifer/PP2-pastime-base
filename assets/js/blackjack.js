@@ -121,9 +121,7 @@ function dealCards(docAPI) {
     
     for (let i = 0; i < cards.length-1; i++) {
         const betBox = betBoxes[i % betBoxes.length]
-        const img = document.createElement('img')
-        img.src = cards[i].image
-        betBox.getElementsByClassName('card-list')[0].appendChild(img)
+        addCardImage(betBox, cards[i])
         
         let boxState
         if (boxState = gameState.betBoxes.get(betBox)) 
@@ -151,6 +149,7 @@ function initEvaluationPhase() {
     const betBoxes = getPlayBoxesDirection()
     
     gameState.betBoxIterator = betBoxes.values()
+    document.getElementById('player-action').addEventListener('click', handlePlayerAction)
     
     selectNextBox()
 }
@@ -181,18 +180,39 @@ function setPlayerActions(availableActions) {
     for (const action of availableActions) {
         const actionElem = document.getElementById(action)
         actionElem.style.visibility = 'visible'
-        actionElem.addEventListener('click', handlePlayerAction, {once:true})
+    }
+}
+
+function resetPlayerActions() {
+    for (const actionElem of document.getElementById('player-action').children) {
+        actionElem.style.visibility = 'hidden'
     }
 }
 
 function handlePlayerAction(ev) {
-    console.log('clicked on', this.id)
-    action[this.id](runEvaluation)
+    console.log('clicked on', ev.target.id)
+    if (!action.hasOwnProperty(ev.target.id)) {
+        console.error('Miss clicked action')
+        return
+    }
+    action[ev.target.id](()=>{
+        resetPlayerActions()
+        runEvaluation()
+    })
+    console.log('should remove unused event listeners')
 }
 
 const action = {
     hit: function(cb){
-        
+        drawCards().then(resp=>{
+            const card = resp.cards[0]
+            const betBox = gameState.currentBetBox.value
+            const boxState = gameState.betBoxes.get(betBox)
+
+            addCardImage(betBox, card)
+            boxState.push(card)
+            updateCardsGameValue(betBox)
+        }).then(cb)
     },
     stand: function(cb){},
     double: function(cb){},
@@ -261,6 +281,11 @@ function loadDealingPhase() {
 function updateCardsGameValue(betBox) {
     const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
     cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).cardsValue()
+}
+
+function addCardImage(betBox, apiCardObject) {
+    betBox.getElementsByClassName('card-list')[0].innerHTML += 
+    `<img src="${apiCardObject.image}">`
 }
 
 // evaluation phase
