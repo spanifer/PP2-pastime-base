@@ -16,7 +16,7 @@ window.addEventListener('load', async function() {
 // Game rules
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
-    BET_INTERVAL_FREQUENCY = 8
+    BET_INTERVAL_FREQUENCY = 5
 
 const gameState = {
     phase: -1,
@@ -187,34 +187,34 @@ function mouseupEvHandler (closure) {
 
 function betOperation (closure) {
     let {betBox, pot, betButton:{dataset:{type}}, recursionCount:count} = closure
-    let value = gameState.player.getPot(betBox)
-    if (!value && value !== 0) {
-        console.error('Something went terribly wrong with bet value: ', value)
-        value = 0;
+    let potValue = gameState.player.getPot(betBox)
+    if (!potValue && potValue !== 0) {
+        console.error('Something went terribly wrong with bet value: ', potValue)
+        potValue = 0;
     }
+    const operandValue = Math.ceil(count/BET_INTERVAL_FREQUENCY)
     switch (type) {
         case 'add':
-            value += Math.ceil(count/BET_INTERVAL_FREQUENCY)
-            if (value >= MAX_BET) {
-                pot.innerText = MAX_BET
-                gameState.player.addPot(betBox, MAX_BET)
+            if (potValue + operandValue >= MAX_BET) {
+                gameState.player.addToPot(betBox, MAX_BET-potValue)
                 closure.isPressed = false
             } else {
-                gameState.player.addPot(betBox, value)
-                pot.innerText = value
+                gameState.player.addToPot(betBox, operandValue)
             }
             break
         case 'sub':
-            value -= Math.ceil(count/BET_INTERVAL_FREQUENCY)
-            if (value <= 0) {
-                pot.innerText = ''
+            if (potValue - operandValue <= 0) {
+                gameState.player.addToPot(betBox, -operandValue)
                 gameState.player.removePot(betBox)
                 closure.isPressed = false
             } else {
-                gameState.player.addPot(betBox, value)
-                pot.innerText = value
+                gameState.player.addToPot(betBox, -operandValue)
             }
             break
         default: throw new Error('No such operation.')
     }
+
+    document.getElementById('player-cash').innerText = gameState.player.cash
+
+    pot.innerText = gameState.player.getPot(betBox) || ''
 } 
