@@ -7,12 +7,6 @@ class Player {
     }
 }
 
-(function() {
-
-function boxTypeCheck (bettingBox) {
-    if (!bettingBox.classList.contains('betting-box')) throw new TypeError('Wrong element used to select betting box!')
-}
-
 Player.prototype.getPot = function (bettingBox) {
     return this.potList.get(bettingBox)
 }
@@ -57,5 +51,3 @@ Player.prototype.addToPot = function (bettingBox, betValue) {
         this.potList[mod](bettingBox, betValue)
     }
 }
-
-}())

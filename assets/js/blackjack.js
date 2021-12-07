@@ -1,11 +1,11 @@
 let deckID;
 
-window.addEventListener('load', async function() {
+window.addEventListener('load', function() {
     deckID = localStorage.getItem('deckID')
 
     if (!deckID) {
         // get a new shuffled deck
-        await getNewDeck()
+        getNewDeck()
         .then(json=>{
             deckID = json.deck_id;
             localStorage.setItem('deckID',json.deck_id);
@@ -13,12 +13,11 @@ window.addEventListener('load', async function() {
     }
 })
 
-// Game rules
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
     BET_INTERVAL_FREQUENCY = 5,
     BLACKJACK = 21,
-    DEALER_RESPONSE_TIMEOUT = 3000;
+    BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg'; 
 
 const gameState = {
     phase: -1,
@@ -84,16 +83,7 @@ const gameProperties = {
         if (this.highCards.includes(cardName)) return 10;
         else return [1,11]
     },
-    playerActions: ["hit","stand","double","split","surrender"],
 }
-
-gameProperties.actionElements = function () {
-    const result = {}
-    gameProperties.playerActions.forEach(action=>{
-        result[action] = document.getElementById(action)
-    })
-    return result
-}()
 
 // Game Course methods and initiators
 // __________________________________
@@ -125,21 +115,33 @@ function dealCards(docAPI) {
     // Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single
     // card to the dealer, followed by an additional card to each of the positions in play.
     betBoxes.push(document.getElementById('dealer'))
+
+    const cards = docAPI.cards
     
-    for (const [i,card] of docAPI.cards.entries()) {
+    for (let i = 0; i < cards.length-1; i++) {
         const betBox = betBoxes[i % betBoxes.length]
         const img = document.createElement('img')
-        img.src = card.image
+        img.src = cards[i].image
         betBox.getElementsByClassName('card-list')[0].appendChild(img)
         
         let boxState
         if (boxState = gameState.betBoxes.get(betBox)) 
-            boxState.push(card)
+            boxState.push(cards[i])
         else
         throw new TypeError('Bet box does not exist!')
         
         updateCardsGameValue(betBox)
     }
+
+    // dealer last card face-down
+    const betBox = betBoxes[betBoxes.length-1]
+    const div = document.createElement('span')
+    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" id="face-down">
+<img src="${cards[cards.length-1].image}" id="face-up" hidden>`
+
+    betBox.getElementsByClassName('card-list')[0].appendChild(div)
+
+    gameState.dealerFaceDownCard = cards[cards.length-1]
 }
     
 function initEvaluationPhase() {
@@ -173,8 +175,6 @@ function evaluateBox(betBox) {
         if (isFirstAction) {
             if (thisBox.cards[0].value !== thisBox.cards[1].value)
                 playerActions.splice(playerActions.indexOf('split'),1)
-            if (cardsValue > 11) 
-                playerActions.splice(playerActions.indexOf('double'),1)
             return playerActions
         } else 
             return playerActions.slice(0,2)
@@ -184,9 +184,9 @@ function evaluateBox(betBox) {
 function dealerResponse(isWin) {
     const dealerMsg = document.getElementById('dealer-message')
     if (isWin) {
-        dealerMsg.innerText = 'You won!'
+        dealerMsg.innerText = 'Blackjack!'
     } else {
-        dealerMsg.innerText = 'Bust!'
+        dealerMsg.innerText = 'That\'s a Bust!'
     }
 }
 

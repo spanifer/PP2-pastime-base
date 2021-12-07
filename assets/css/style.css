@@ -128,3 +128,8 @@
 #betting-area .card-list img {
     width: var(--playing-card-width)
 }
+
+#face-down {
+    display: inline-block;
+    border-radius: 4%;
+}
