@@ -75,6 +75,9 @@
     justify-content: space-around;
     align-items: center;
     flex-wrap: nowrap;
+}
+
+#player-action > span {
     visibility: hidden;
 }
 

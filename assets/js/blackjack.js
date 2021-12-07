@@ -17,7 +17,8 @@ window.addEventListener('load', async function() {
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
     BET_INTERVAL_FREQUENCY = 5,
-    BLACKJACK = 21
+    BLACKJACK = 21,
+    DEALER_RESPONSE_TIMEOUT = 3000;
 
 const gameState = {
     phase: -1,
@@ -47,13 +48,14 @@ Cards.prototype.push = function (card) {
     this.cards.push(card)
 }
 
-Cards.prototype.addCard = function () {
+Cards.prototype.addCard = function (cb) {
     drawCards(1).then(resp=>{
         this.cards.push(resp.cards[0])
-    })
+        return resp.cards[0]
+    }).then(cb)
 }
 
-Cards.prototype.gameValue = function () {
+Cards.prototype.cardsValue = function () {
     // reduce cards to an object where card values are summed and aces are sorted separately
     const {fixedValue, aces} = this.cards
     .reduce((sortedCards,card)=>{
@@ -82,7 +84,16 @@ const gameProperties = {
         if (this.highCards.includes(cardName)) return 10;
         else return [1,11]
     },
+    playerActions: ["hit","stand","double","split","surrender"],
 }
+
+gameProperties.actionElements = function () {
+    const result = {}
+    gameProperties.playerActions.forEach(action=>{
+        result[action] = document.getElementById(action)
+    })
+    return result
+}()
 
 // Game Course methods and initiators
 // __________________________________
@@ -144,6 +155,44 @@ function initEvaluationPhase() {
         // repeat until bust/blackjack/surrender
     }
 }
+
+/**
+ * @param {HTMLDivElement} betBox 
+ * @returns {Array|Boolean} available player actions or false on bust, true on win
+ */
+function evaluateBox(betBox) {
+    const thisBox = gameState.betBoxes.get(betBox)
+    const isFirstAction = thisBox.cards.length === 2
+    const cardsValue = thisBox.cardsValue()
+    const playerActions = ["hit","stand","double","split","surrender"]
+    if (cardsValue > BLACKJACK) {
+        return false
+    } else if (cardsValue === BLACKJACK) {
+        return true
+    } else {
+        if (isFirstAction) {
+            if (thisBox.cards[0].value !== thisBox.cards[1].value)
+                playerActions.splice(playerActions.indexOf('split'),1)
+            if (cardsValue > 11) 
+                playerActions.splice(playerActions.indexOf('double'),1)
+            return playerActions
+        } else 
+            return playerActions.slice(0,2)
+    }
+}
+
+function dealerResponse(isWin) {
+    const dealerMsg = document.getElementById('dealer-message')
+    if (isWin) {
+        dealerMsg.innerText = 'You won!'
+    } else {
+        dealerMsg.innerText = 'Bust!'
+    }
+}
+
+function handlePlayerAction(ev) {
+    this.id
+}
 // _________________________________
 
 // Game UI modifiers
@@ -154,6 +203,9 @@ function loadBettingPhase() {
     for (const buttonsWrapper of betButtons) {
         buttonsWrapper.classList.add('allow-bet')
     }
+    const dealerMsg = document.getElementById('dealer-message')
+    dealerMsg.innerText = 'Place your bets please'
+    showDealerMsg()
 }
 // disable bets
 function unloadBettingPhase() {
@@ -170,7 +222,7 @@ function loadDealingPhase() {
 
 function updateCardsGameValue(betBox) {
     const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
-    cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).gameValue()
+    cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).cardsValue()
 }
 
 // evaluation phase
@@ -180,6 +232,14 @@ function loadEvaluationPhase() {
 
 function unloadEvaluationPhase() {
     document.getElementById('player-action').style.visibility = 'hidden'
+}
+
+function showDealerMsg() {
+    document.getElementById('dealer-message').style.visibility = 'visible'
+}
+
+function hideDealerMsg() {
+    document.getElementById('dealer-message').style.visibility = 'hidden'
 }
 // _________________________________
 
