@@ -17,6 +17,7 @@ const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
     BET_INTERVAL_FREQUENCY = 5,
     BLACKJACK = 21,
+    DEALER_MSG_TIMEOUT = 2000,
     BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg'; 
 
 const gameState = {
@@ -148,19 +149,60 @@ function initEvaluationPhase() {
     loadEvaluationPhase()
     gameState.continuePhase()
     const betBoxes = getPlayBoxesDirection()
-    for (const betBox of betBoxes) {
-      // start play
-        // highlight current play area
-        // find and show available player actions
-        // wait for player input
-        // handle action
-        // repeat until bust/blackjack/surrender
+    
+    gameState.betBoxIterator = betBoxes.values()
+    
+    selectNextBox()
+}
+
+function selectNextBox() {
+    gameState.currentBetBox = gameState.betBoxIterator.next()
+    if (gameState.currentBetBox.done) {
+        console.log('Now run the dealer turn')
+    } else {
+        runEvaluation()
     }
+}
+
+function runEvaluation() {
+    const evalResult = evaluateBox(gameState.currentBetBox.value)
+    if (typeof evalResult === 'boolean') {
+        dealerResponse(evalResult)
+        showDealerMsg()
+        setTimeout(()=>{
+            selectNextBox()
+        ,DEALER_MSG_TIMEOUT})
+    } else {
+        setPlayerActions(evalResult)
+    }
+}
+
+function setPlayerActions(availableActions) {
+    for (const action of availableActions) {
+        const actionElem = document.getElementById(action)
+        actionElem.style.visibility = 'visible'
+        actionElem.addEventListener('click', handlePlayerAction, {once:true})
+    }
+}
+
+function handlePlayerAction(ev) {
+    console.log('clicked on', this.id)
+    action[this.id](runEvaluation)
+}
+
+const action = {
+    hit: function(cb){
+        
+    },
+    stand: function(cb){},
+    double: function(cb){},
+    split: function(cb){},
+    surrender: function(cb){}
 }
 
 /**
  * @param {HTMLDivElement} betBox 
- * @returns {Array|Boolean} available player actions or false on bust, true on win
+ * @returns {Array|Boolean} available player actions id list or false on bust, true on win
  */
 function evaluateBox(betBox) {
     const thisBox = gameState.betBoxes.get(betBox)
@@ -188,10 +230,6 @@ function dealerResponse(isWin) {
     } else {
         dealerMsg.innerText = 'That\'s a Bust!'
     }
-}
-
-function handlePlayerAction(ev) {
-    this.id
 }
 // _________________________________
 
