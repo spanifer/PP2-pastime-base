@@ -42,20 +42,25 @@ gameState.resetBetBoxes()
 
 function Cards () {
     this.cards = []
+    this.currentCardsValue = 0
+    this.cardsValueChanged = false
 }
 
 Cards.prototype.push = function (card) {
     this.cards.push(card)
+    this.cardsValueChanged = true
 }
 
 Cards.prototype.addCard = function (cb) {
     drawCards(1).then(resp=>{
         this.cards.push(resp.cards[0])
+        this.cardsValueChanged = true
         return resp.cards[0]
     }).then(cb)
 }
 
 Cards.prototype.cardsValue = function () {
+    if (! this.cardsValueChanged) return this.currentCardsValue
     // reduce cards to an object where card values are summed and aces are sorted separately
     const {fixedValue, aces} = this.cards
     .reduce((sortedCards,card)=>{
@@ -70,7 +75,9 @@ Cards.prototype.cardsValue = function () {
     // only add high ace value if it is not over BLACKJACK value
     aces.forEach(ace=>cardsValue += 
         aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
-        
+    
+    this.currentCardsValue = cardsValue
+    this.cardsValueChanged = false
     return cardsValue
 }
 
@@ -325,9 +332,11 @@ function dealerDecision(dealerBox) {
             dealerDecision(dealerBox)
         })
     } else {
-        console.log('Now run conclusion phase')
+        initConclusion(dealerBox)
     }
+}
 
+function initConclusion(dealerBox) {
 
 }
 // _________________________________
