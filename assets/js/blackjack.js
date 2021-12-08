@@ -229,6 +229,7 @@ const action = {
             addCardImage(betBox, card)
             boxState.push(card)
             updateCardsGameValue(betBox)
+            updateCashAndPot(betBox)
 
             resetPlayerActions()
             selectNextBox()
@@ -244,11 +245,10 @@ const action = {
     surrender: function(){
         const betBox = gameState.currentBetBox.value
         const potValue = gameState.player.getPot(betBox)
+
         gameState.player.addToPot(betBox, -Math.floor(potValue / 2))
-
-        betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox)
-        document.getElementById('player-cash').innerText = gameState.player.cash
-
+        updateCashAndPot(betBox)
+        
         resetPlayerActions()
         selectNextBox()
     }
@@ -271,7 +271,7 @@ function evaluateBox(betBox) {
         if (isFirstAction) {
             if (thisBox.cards[0].value !== thisBox.cards[1].value)
                 playerActions.splice(playerActions.indexOf('split'),1)
-            if (gameState.player.cash / gameState.player.getPot(betBox) < 2)
+            if (gameState.player.cash / gameState.player.getPot(betBox) < 1)
                 playerActions.splice(playerActions.indexOf('double'),1)
             return playerActions
         } else 
@@ -292,6 +292,12 @@ function dealerResponse(isWin) {
 // Game UI modifiers
 // _________________________________
 // allow player to place bets on betting phase
+function updateCashAndPot(betBox) {
+    if (betBox instanceof HTMLDivElement)
+        betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox) || ''
+    document.getElementById('player-cash').innerText = gameState.player.cash
+}
+
 function loadBettingPhase() {
     const betButtons = document.getElementsByClassName('bet')
     for (const buttonsWrapper of betButtons) {
@@ -426,7 +432,5 @@ function betOperation (closure) {
         default: throw new Error('No such operation.')
     }
 
-    document.getElementById('player-cash').innerText = gameState.player.cash
-
-    pot.innerText = gameState.player.getPot(betBox) || ''
+    updateCashAndPot(betBox)
 } 
