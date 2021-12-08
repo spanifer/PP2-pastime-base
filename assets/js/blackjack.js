@@ -287,6 +287,18 @@ function dealerResponse(isWin) {
         dealerMsg.innerText = 'That\'s a Bust!'
     }
 }
+
+function initDealerTurn() {
+    
+}
+
+function flipDealerCard() {
+    
+}
+
+function dealerDecision() {
+
+}
 // _________________________________
 
 // Game UI modifiers
