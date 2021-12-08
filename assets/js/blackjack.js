@@ -135,8 +135,7 @@ function dealCards(docAPI) {
     // dealer last card face-down
     const betBox = betBoxes[betBoxes.length-1]
     const div = document.createElement('span')
-    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" id="face-down">
-<img src="${cards[cards.length-1].image}" id="face-up" hidden>`
+    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" id="face-down">`
 
     betBox.getElementsByClassName('card-list')[0].appendChild(div)
 
@@ -158,6 +157,7 @@ function selectNextBox() {
     gameState.currentBetBox = gameState.betBoxIterator.next()
     if (gameState.currentBetBox.done) {
         console.log('Now run the dealer turn')
+        initDealerTurn()
     } else {
         runEvaluation()
     }
@@ -170,7 +170,8 @@ function runEvaluation() {
         showDealerMsg()
         setTimeout(()=>{
             selectNextBox()
-        ,DEALER_MSG_TIMEOUT})
+            hideDealerMsg()
+        },DEALER_MSG_TIMEOUT)
     } else {
         setPlayerActions(evalResult)
     }
@@ -255,7 +256,7 @@ const action = {
 }
 
 /**
- * @param {HTMLDivElement} betBox 
+ * @param {HTMLDivElement} betBox
  * @returns {Array|Boolean} available player actions id list or false on bust, true on win
  */
 function evaluateBox(betBox) {
@@ -289,14 +290,44 @@ function dealerResponse(isWin) {
 }
 
 function initDealerTurn() {
-    
+    document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
+    flipDealerCard(document.getElementById('dealer'))
 }
 
-function flipDealerCard() {
-    
+function flipDealerCard(dealerBox) {
+    const dealerCards = gameState.betBoxes.get(dealerBox)
+    dealerCards.push(gameState.dealerFaceDownCard)
+
+    const imgWrapper = dealerBox.getElementsByTagName('span')[0]
+
+    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up">`
+
+    document.getElementById('face-up').addEventListener('load', ()=>{
+        dealerBox.querySelectorAll('span > img').forEach(card=>card.classList.toggle('flip'))
+    })
+
+    updateCardsGameValue(dealerBox)
+
+    dealerDecision(dealerBox)
 }
 
-function dealerDecision() {
+/**
+ * @param {HTMLDivElement} dealerBox
+ */
+function dealerDecision(dealerBox) {
+    // not too bright dealer only draws card if cardsValue is less than <18
+    if (gameState.betBoxes.get(dealerBox).cardsValue() < 18) {
+        drawCards().then(resp=>{
+            const card = resp.cards[0]
+            gameState.betBoxes.get(dealerBox).push(card)
+            addCardImage(dealerBox, card)
+            updateCardsGameValue(dealerBox)
+            dealerDecision(dealerBox)
+        })
+    } else {
+        console.log('Now run conclusion phase')
+    }
+
 
 }
 // _________________________________

@@ -129,7 +129,33 @@
     width: var(--playing-card-width)
 }
 
+#dealer>.card-list>span {
+    position: relative;
+}
+
 #face-down {
+    position: absolute;
     display: inline-block;
     border-radius: 4%;
+    backface-visibility: hidden;
+    transform: rotateY(0deg);
+    transition: transform .5s;
+}
+
+#face-up {
+    position: absolute;
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+    transition: transform .5s;
+}
+
+/* flip solution from https://moirahartigan.github.io/Portfolio-2---Alien-Memory-Game/index.html */
+/* and that from https://marina-ferreira.github.io/tutorials/js/memory-game/ */
+
+#face-up.flip {
+    transform: rotateY(0deg);
+}
+
+#face-down.flip {
+    transform: rotateY(180deg);
 }
