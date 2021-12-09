@@ -17,19 +17,19 @@
 }
 
 /* Header style */
-#blackjack > header {
+header {
     position: fixed;
     width: 100%;
     height: var(--header-height);
 }
 
-#blackjack > header > * {
+header > * {
     float: right;
     line-height: var(--header-height);
 }
 
 /* Footer style */
-#blackjack > footer {
+footer {
     position: fixed;
     width: 100%;
     height: var(--footer-height);
@@ -38,7 +38,7 @@
 
 /* Main game */
 
-#blackjack > main {
+main {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
@@ -87,7 +87,7 @@
     width: 100vw;
 }
 
-#betting-area .bet {
+.bet {
     visibility: hidden;
     text-align: center;
 }
@@ -100,36 +100,36 @@
     display: inline-block;
 }
 
-#betting-area .betting-box:hover .allow-bet {
+.betting-box:hover .allow-bet {
     visibility: visible;
 }
 
-#betting-area .betting-box:hover {
+.betting-box:hover {
     background-color: #aaa;
 }
 
-#betting-area .betting-box {
+.betting-box {
     height: 400px;
     width: 100%;
 }
 
-#betting-area .card-list {
+.card-list {
     display: flex;
     flex-wrap: nowrap;
     width: 80%;
 }
 
-#betting-area .playing-card {
+.playing-card {
     min-width: calc(var(--playing-card-width) / 4);
     height: var(--playing-card-height);
 }
 
 /* playing-cards populated images */
-#betting-area .card-list img {
+.card-list img {
     width: var(--playing-card-width)
 }
 
-#dealer>.card-list>span {
+.card-list>span {
     position: relative;
 }
 

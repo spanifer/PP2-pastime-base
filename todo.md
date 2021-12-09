@@ -11,11 +11,11 @@
 
 -   ## [Research](#blackjack)
         
--   ## Viability
-    Opportunity / Problem | Importance | Feasibility
-    --- | --- | ---
-    BlackJack game core | 5 | 5
-    BlackJack with [API](https://deckofcardsapi.com/) ~~or same on local~~ | 5 | 5
+-   ## Viability in implementation priority order
+    Opportunity / Problem | Importance | Feasibility | Status
+    --- | --- | --- | ---
+    BlackJack game core | 5 | 5 | ✔
+    BlackJack with [API](https://deckofcardsapi.com/) ~~or same on local~~ | 5 | 5 | ✔
     BlackJack UI styling | 5 | 4
     ~~BlackJack with SVG cards~~ | ~~4~~ | ~~3~~
     Store Game state on local to continue | 4 | 3
@@ -43,7 +43,7 @@
 - the site can have a get in contact page, or report error
     - Or the contact page could contain frequently asked questions ...
 
-## Games
+# Games
 -   ## BlackJack
     rules and ui to implement in this order of importance
     - [52-card deck](https://en.wikipedia.org/wiki/Standard_52-card_deck)
@@ -61,14 +61,8 @@
     - Every time a user runs out of cash can only receive a small amount to stake again DAILY_GAME_TOKEN^(1/7) - ish
     - Timeout on multiplayer?
 
-    - #### Local Vars
-        - MAX_BET
-        - player:object
-            - totalCoins:int
-            - bettingBox:int //indexed?
-
-    - #### Game Phases
-        - Round cycles:
+    - ### Game Phases
+        - #### Round cycles:
             1. betting phase
                 - At a blackjack table, the dealer faces five to nine playing positions from behind a semicircular table.
                 - Between one and eight standard 52-card decks are shuffled together.
@@ -89,3 +83,24 @@
                     1. **Double down**: Increase the initial bet by 100% and take exactly one more card.
                     1. **Split**: Create two hands from a starting hand where both cards are the same value. Each new hand gets another card so that the player has two starting hands. This requires an additional bet on the second hand. The two hands are played out independently, and the wager on each hand is won or lost independently. In the case of cards worth 10 points, some casinos only allow splitting when the cards are the same rank. For example, 10-10 could be split, but K-10 could not. Doubling and re-splitting after splitting are often restricted. A 10-valued card and an ace resulting from a split usually isn't considered a blackjack. Hitting split aces is often not allowed. Non-controlling players can opt to put up a second bet or not. If they do not, they only get paid or lose on one of the two post-split hands.
                     1. **Surrender**: Forfeit half the bet and end the hand immediately. This option is only available at some tables in some casinos, and the option is only available as the first decision.
+            - ##### ~~Insurance~~ 
+                If the dealer shows an ace, an "insurance" bet is allowed. Insurance is a side bet that the dealer has a blackjack. The dealer asks for insurance bets before the first player plays. Insurance bets of half the player's current bet are placed on the "insurance bar" above player's cards. If the dealer has a blackjack, insurance pays 2 to 1. In most casinos, the dealer looks at the down card and pays off or takes the insurance bet immediately. In other casinos, the payoff waits until the end of the play.
+
+                In face-down games, if a player has more than one hand, they are allowed to look at all their hands before deciding. This is the only condition where a player can look at multiple hands.
+
+                Players with blackjack can also take insurance.
+
+                Insurance bets lose money in the long run. The dealer has a blackjack less than one-third of the time. Players can also take insurance when a 10-valued card shows, but the dealer has an ace in the hole less than one-tenth of the time.
+
+                The insurance bet is susceptible to advantage play. It is advantageous to make an insurance bet whenever the hole card has more than a one in three chance of being a ten. Card counting techniques can identify such situations.
+    - ### CSS styling
+        1. Elements positioning
+        1. Responsive elements
+        1. Button feedback, highlight active betBox
+        1. Header and footer shows in modal?
+
+    - ### Game phase timing
+
+    - ### Focusable input elements
+
+    - ### Accessibility
