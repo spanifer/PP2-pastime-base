@@ -19,6 +19,10 @@ Player.prototype.removePot = function (bettingBox) {
     this.potList.delete(bettingBox)
 }
 
+Player.prototype.resetPotList = function () {
+    this.potList.clear()
+}
+
 const mod = Symbol('modify')
 /**
  * Replaces a Map.set(key, Map.get(key) + value)

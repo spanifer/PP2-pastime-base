@@ -11,6 +11,9 @@ window.addEventListener('load', function() {
             localStorage.setItem('deckID',json.deck_id);
         })
     }
+
+    resetPlayerActions()
+    resetGame()
 })
 
 const MAX_BET = 100,
@@ -30,10 +33,10 @@ const gameState = {
     getPhase: function () {
         return this.acceptedPhases[this.phase]
     },
+    betBoxes: new Map(),
     resetBetBoxes: function (){
-        const map = new Map()
-        map.set(document.getElementById('dealer'), new Cards())
-        this.betBoxes = map
+        this.betBoxes.clear()
+        this.betBoxes.set(document.getElementById('dealer'), new Cards())
     },
 }
 
@@ -150,7 +153,6 @@ function dealCards(docAPI) {
 }
     
 function initEvaluationPhase() {
-    loadEvaluationPhase()
     gameState.continuePhase()
     const betBoxes = getPlayBoxesDirection()
     
@@ -188,12 +190,6 @@ function setPlayerActions(availableActions) {
     for (const action of availableActions) {
         const actionElem = document.getElementById(action)
         actionElem.style.visibility = 'visible'
-    }
-}
-
-function resetPlayerActions() {
-    for (const actionElem of document.getElementById('player-action').children) {
-        actionElem.style.visibility = 'hidden'
     }
 }
 
@@ -337,13 +333,15 @@ function dealerDecision(dealerBox) {
 }
 
 function initConclusion(dealerBox) {
-    const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
-    const playerValue = gameState.betBoxes.get(betBox).cardsValue()
+    gameState.continuePhase()
 
+    const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
+    
     for (const betBox of getPlayBoxesDirection().values()) {
-        if (playerValue > 21) {
+        const playerValue = gameState.betBoxes.get(betBox).cardsValue()
+        if (playerValue > BLACKJACK) {
             concludeBet(betBox,'lose')
-        } else if (dealerValue > 21) {
+        } else if (dealerValue > BLACKJACK) {
             concludeBet(betBox,'win')
         } else if (playerValue > dealerValue) {
             concludeBet(betBox,'win')
@@ -354,7 +352,7 @@ function initConclusion(dealerBox) {
         }
     }
 
-    // resetGame()
+    resetGame()
 }
 
 function concludeBet(betBox, status) {
@@ -369,14 +367,42 @@ function concludeBet(betBox, status) {
     }
     // will clear pot list
 }
+
+function resetGame() {
+    gameState.betBoxes.forEach((val,key) => {
+        key.getElementsByClassName('card-list')[0].innerHTML = ''
+        key.getElementsByClassName('cards-value')[0].innerHTML = ''
+    });
+    gameState.betBoxes.clear()
+    gameState.resetBetBoxes()
+    
+    gameState.player.potList.forEach((val,key,map)=>{
+        map.set(key, null)
+        updatePot(key)
+    })
+    gameState.player.resetPotList()
+    
+    updateCashAndPot()
+
+    gameState.continuePhase()
+
+    loadBettingPhase()
+    
+    returnCards()
+    shuffleDeck()
+}
 // _________________________________
 
 // Game UI modifiers
 // _________________________________
 // allow player to place bets on betting phase
+function updatePot(betBox) {
+    if (betBox)
+    betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox) || ''
+}
+
 function updateCashAndPot(betBox) {
-    if (betBox instanceof HTMLDivElement)
-        betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox) || ''
+    updatePot(betBox)
     document.getElementById('player-cash').innerText = gameState.player.cash
 }
 
@@ -385,9 +411,8 @@ function loadBettingPhase() {
     for (const buttonsWrapper of betButtons) {
         buttonsWrapper.classList.add('allow-bet')
     }
-    const dealerMsg = document.getElementById('dealer-message')
-    dealerMsg.innerText = 'Place your bets please'
-    showDealerMsg()
+    showDealerMsg('Place your bets please')
+    document.getElementById('start-button').style.visibility = 'visible'
 }
 // disable bets
 function unloadBettingPhase() {
@@ -413,16 +438,16 @@ function addCardImage(betBox, apiCardObject) {
 }
 
 // evaluation phase
-function loadEvaluationPhase() {
-    document.getElementById('player-action').style.visibility = 'visible'
+function resetPlayerActions() {
+    for (const actionElem of document.getElementById('player-action').children) {
+        actionElem.style.visibility = 'hidden'
+    }
 }
 
-function unloadEvaluationPhase() {
-    document.getElementById('player-action').style.visibility = 'hidden'
-}
-
-function showDealerMsg() {
-    document.getElementById('dealer-message').style.visibility = 'visible'
+function showDealerMsg(msg) {
+    const dealerMsgElem = document.getElementById('dealer-message')
+    dealerMsgElem.style.visibility = 'visible'
+    if (typeof msg === 'string') dealerMsgElem.innerText = msg;
 }
 
 function hideDealerMsg() {
