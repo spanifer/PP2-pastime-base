@@ -337,7 +337,37 @@ function dealerDecision(dealerBox) {
 }
 
 function initConclusion(dealerBox) {
+    const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
+    const playerValue = gameState.betBoxes.get(betBox).cardsValue()
 
+    for (const betBox of getPlayBoxesDirection().values()) {
+        if (playerValue > 21) {
+            concludeBet(betBox,'lose')
+        } else if (dealerValue > 21) {
+            concludeBet(betBox,'win')
+        } else if (playerValue > dealerValue) {
+            concludeBet(betBox,'win')
+        } else if (playerValue === dealerValue) {
+            concludeBet(betBox,'draw')
+        } else {
+            concludeBet(betBox,'lose')
+        }
+    }
+
+    // resetGame()
+}
+
+function concludeBet(betBox, status) {
+    const player = gameState.player
+    if (status === 'win') {
+        player.cash += player.getPot(betBox) * 2
+        return
+    }
+    if (status === 'draw') {
+        player.cash += player.getPot(betBox)
+        return
+    }
+    // will clear pot list
 }
 // _________________________________
 
