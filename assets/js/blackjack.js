@@ -21,7 +21,7 @@ const MAX_BET = 100,
     BET_INTERVAL_FREQUENCY = 5,
     BLACKJACK = 21,
     DEALER_MSG_TIMEOUT = 2000,
-    BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg'; 
+    BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg';
 
 const gameState = {
     phase: -1,
@@ -303,7 +303,7 @@ function flipDealerCard(dealerBox) {
 
     const imgWrapper = dealerBox.getElementsByTagName('span')[0]
 
-    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up">`
+    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up alt='The back side of a card'">`
 
     document.getElementById('face-up').addEventListener('load', ()=>{
         dealerBox.querySelectorAll('span > img').forEach(card=>card.classList.toggle('flip'))
@@ -435,7 +435,7 @@ function updateCardsGameValue(betBox) {
 function addCardImage(betBox, apiCardObject) {
     betBox.getElementsByClassName('card-list')[0].innerHTML += 
     `<div class='playing-card'>
-    <img src="${apiCardObject.image}">
+    <img src="${apiCardObject.image}" alt="${apiCardObject.value} of ${apiCardObject.suit}">
 </div>`
 }
 
