@@ -2,10 +2,12 @@
     --header-height: 55px;
     --footer-height: 90px;
     --player-action-bar-height: 4rem;
+
+    --bet-area-gap: 2rem;
     
     --button-height: 55px;
 
-    --playing-card-width: 80px;
+    --playing-card-width: 120px;
     --playing-card-height: calc(var(--playing-card-width)*(182/131))
 }
 
@@ -13,7 +15,7 @@
     margin: 0;
     border: none;
     padding: 0;
-    /* box-sizing: border-box; */
+    box-sizing: border-box;
 }
 
 /* Header style */
@@ -21,6 +23,8 @@ header {
     position: fixed;
     width: 100%;
     height: var(--header-height);
+
+    display: none;
 }
 
 header > * {
@@ -34,6 +38,8 @@ footer {
     width: 100%;
     height: var(--footer-height);
     bottom: 0;
+
+    display: none;
 }
 
 /* Main game */
@@ -42,49 +48,81 @@ main {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-}
-
-#game-wrapper { 
-    width: 100%;
-    height: 100%;
-    display: grid;
-    /* Refactor to have a fixed table area */
-    grid-template: 
-    "table table" 70%
-    "cash  action" 4rem / 20% 80%;
-    align-content: center;
-}
-
-#table {
-    grid-area: table;
-    display: grid;
-    grid-template-rows: 20% 80%;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
+#game-wrapper { 
+    width: 1200px;
+    height: 1200px;
+    max-height: 100vh;
+}
+
+#table {
+    background-color: green;
+    height: calc(100% - var(--player-action-bar-height));
+}
+
 #player-cash {
-    grid-area: cash;
+    font-size: 2rem;
     text-align: center;
     line-height: var(--player-action-bar-height);
+    float: left;
+    width: calc(100%/6);
 }
 
 #player-action {
-    grid-area: action;
+    float: left;
+    width: calc(100% * (5/6));
+    height: var(--player-action-bar-height);
     display: flex;
-    justify-content: space-around;
     align-items: center;
     flex-wrap: nowrap;
 }
 
-#player-action > span {
-    visibility: hidden;
+#player-action > * {
+    font-size: 2rem;
+    flex: 1;
+    text-align: center;
+    line-height: var(--player-action-bar-height);
 }
 
-/* playing-box */
+#dealer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+    align-items: center;
+    min-width: fit-content;
+    width: 50%;
+    height: calc(100% / 2);
+    margin: auto;
+}
+
+#dealer > .card-list {
+    height: var(--playing-card-height);
+}
+
+/* play area */
 #betting-area {
+    height: calc(100% / 2);
+    overflow-y: auto;
+    width: 100%;
+}
+
+.betting-box {
+    float: left;
+    width: calc(100% / 3 - var(--bet-area-gap)*(2/3));
+    margin-left: var(--bet-area-gap);
+    height: 100%;
     display: flex;
-    width: 100vw;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.betting-box:first-child {
+    margin-left: 0;
 }
 
 .bet {
@@ -108,20 +146,25 @@ main {
     background-color: #aaa;
 }
 
-.betting-box {
-    height: 400px;
-    width: 100%;
-}
-
 .card-list {
     display: flex;
     flex-wrap: nowrap;
-    width: 80%;
+    width: 100%;
 }
 
-.playing-card {
-    min-width: calc(var(--playing-card-width) / 4);
+.card-list>span {
+    position: relative;
+    display: inline-block;
+    width: var(--playing-card-width);
+}
+
+.playing-card, .card-list>span {
+    min-width: calc(var(--playing-card-width) / 6);
     height: var(--playing-card-height);
+}
+
+.card-list > .playing-card:last-child {
+    min-width: var(--playing-card-width);
 }
 
 /* playing-cards populated images */
@@ -129,8 +172,21 @@ main {
     width: var(--playing-card-width)
 }
 
-.card-list>span {
-    position: relative;
+.cards-value, .pot {
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 2rem;
+}
+
+#dealer-message, #start-button {
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 2rem;
+    transition: background-color 0.3s;
+}
+
+#start-button:active {
+    background-color: #aaa0;
 }
 
 #face-down {
@@ -158,4 +214,100 @@ main {
 
 #face-down.flip {
     transform: rotateY(180deg);
+}
+
+
+
+@media screen and (max-width: 1200px){
+
+    #game-wrapper {
+        width: 800px;
+        height: 800px;
+        max-height: 100vh;
+    }
+
+    .playing-card, .card-list>span, #dealer>.card-list {
+        min-width: calc(var(--playing-card-width)*(2/3) / 6);
+        height: calc(var(--playing-card-height)*(2/3));
+    }
+
+    .card-list img {
+        width: calc(var(--playing-card-width)*(2/3))
+    }
+    
+    .card-list > .playing-card:last-child {
+        min-width: calc(var(--playing-card-width)*(2/3));
+    }
+
+    .cards-value, .pot, #dealer-message, #start-button {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        font-size: 1.5rem;
+    }
+
+    #player-action > * , #player-cash {
+        font-size: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 992px){
+    #game-wrapper {
+        width: 650px;
+        height: 650px;
+        max-height: 100vh;
+    }
+
+    .playing-card, .card-list>span, #dealer>.card-list {
+        min-width: calc(var(--playing-card-width)*(2/3) / 6);
+        height: calc(var(--playing-card-height)*(2/3));
+    }
+
+    .card-list img {
+        width: calc(var(--playing-card-width)*(2/3))
+    }
+    
+    .card-list > .playing-card:last-child {
+        min-width: calc(var(--playing-card-width)*(2/3));
+    }
+
+    .cards-value, .pot, #dealer-message, #start-button {
+        height: 2rem;
+        line-height: 2rem;
+        font-size: 1.2rem;
+    }
+
+    #player-action > *, #player-cash {
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 768px){
+    #game-wrapper {
+        width: 450px;
+        height: 600px;
+        max-height: 100vh;
+    }
+
+    .playing-card, .card-list>span, #dealer>.card-list {
+        min-width: calc(var(--playing-card-width)*(2/5) / 6);
+        height: calc(var(--playing-card-height)*(2/5));
+    }
+
+    .card-list img {
+        width: calc(var(--playing-card-width)*(2/5))
+    }
+    
+    .card-list > .playing-card:last-child {
+        min-width: calc(var(--playing-card-width)*(2/5));
+    }
+
+    .cards-value, .pot, #dealer-message, #start-button {
+        height: 1.2rem;
+        line-height: 1.2rem;
+        font-size: 1rem;
+    }
+
+    #player-action > *, #player-cash {
+        font-size: 1rem;
+    }
 }

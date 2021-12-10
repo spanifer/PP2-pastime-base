@@ -434,7 +434,9 @@ function updateCardsGameValue(betBox) {
 
 function addCardImage(betBox, apiCardObject) {
     betBox.getElementsByClassName('card-list')[0].innerHTML += 
-    `<img src="${apiCardObject.image}">`
+    `<div class='playing-card'>
+    <img src="${apiCardObject.image}">
+</div>`
 }
 
 // evaluation phase
