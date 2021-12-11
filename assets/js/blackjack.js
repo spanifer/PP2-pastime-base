@@ -116,7 +116,6 @@ function initDealingPhase() {
     .then(apiResponse => {
         if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
         dealCards(apiResponse)
-        initEvaluationPhase()
     })
 }
 
@@ -172,6 +171,7 @@ function dealCards(docAPI) {
 
         gameState.dealerFaceDownCard = cards[cards.length-1]
 
+        initEvaluationPhase()
     }
 }
     
@@ -186,10 +186,12 @@ function initEvaluationPhase() {
 }
 
 function selectNextBox() {
+    if (gameState.currentBetBox) toggleActiveBox(gameState.currentBetBox.value)
     gameState.currentBetBox = gameState.betBoxIterator.next()
     if (gameState.currentBetBox.done) {
         initDealerTurn()
     } else {
+        toggleActiveBox(gameState.currentBetBox.value)
         runEvaluation()
     }
 }
@@ -381,6 +383,8 @@ function initConclusion(dealerBox) {
 
         const betBox = iteration.value
 
+        toggleActiveBox(betBox)
+
         const playerValue = gameState.betBoxes.get(betBox).cardsValue()
         if (playerValue > BLACKJACK) {
             concludeBet(betBox,'lose')
@@ -426,6 +430,9 @@ function resetGame() {
     })
     gameState.player.resetPotList()
     
+    gameState.currentBetBox = null
+    resetActiveBoxes()
+
     updateCashAndPot()
 
     gameState.continuePhase()
@@ -473,6 +480,14 @@ function unloadBettingPhase() {
     for (const buttonsWrapper of betButtons) {
         buttonsWrapper.classList.remove('allow-bet')
     }
+}
+
+function toggleActiveBox(betBox) {
+    betBox.classList.toggle('active-box')
+}
+
+function resetActiveBoxes() {
+    [...document.getElementById('betting-area').children].forEach(bb=>bb.classList.remove('active-box'))
 }
 
 function loadDealingPhase() {

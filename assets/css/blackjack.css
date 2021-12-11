@@ -134,8 +134,12 @@ main {
     justify-content: flex-end;
     align-items: center;
 
-    box-shadow: inset 0 0 0.5rem var(--correct);
+    box-shadow: inset 0 0 0.5rem var(--general-text-color);
     border-radius: 10px;
+}
+
+.active-box {
+    box-shadow: inset 0 0 2rem var(--correct);
 }
 
 .betting-box:first-child {
