@@ -8,7 +8,15 @@
     --button-height: 55px;
 
     --playing-card-width: 120px;
-    --playing-card-height: calc(var(--playing-card-width)*(182/131))
+    --playing-card-height: calc(var(--playing-card-width)*(182/131));
+
+    --general-text-color: #EAF0CE;
+    --background-color: #0e4d2f;
+    --table-background-color: #1D7C4E;
+    --table-border-color: #784A10;
+
+    --erroneous: #fccfc5;
+    --correct: #D6D0DC;
 }
 
 * {
@@ -51,6 +59,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--background-color);
 }
 
 #game-wrapper { 
@@ -60,8 +69,12 @@ main {
 }
 
 #table {
-    background-color: green;
+    background-color: var(--table-background-color);
     height: calc(100% - var(--player-action-bar-height));
+    border: 0.5rem solid var(--table-border-color);
+    border-radius: 3rem;
+    box-shadow: inset 0 0 0.5rem var(--table-border-color);
+    color: var(--general-text-color);
 }
 
 #player-cash {
@@ -70,6 +83,7 @@ main {
     line-height: var(--player-action-bar-height);
     float: left;
     width: calc(100%/6);
+    color: var(--correct);
 }
 
 #player-action {
@@ -119,31 +133,39 @@ main {
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
+
+    box-shadow: inset 0 0 0.5rem var(--correct);
+    border-radius: 10px;
 }
 
 .betting-box:first-child {
     margin-left: 0;
+
+    border-bottom-left-radius: 2.5rem; 
+}
+
+.betting-box:last-child {
+    border-bottom-right-radius: 2.5rem; 
 }
 
 .bet {
     visibility: hidden;
     text-align: center;
+    line-height: var(--button-height);
 }
 
-.bet > div {
+.bet > * {
     width: var(--button-height);
     height: var(--button-height);
     border-radius: 50%;
-    border: 2px solid black;
+    background-color: #0000;
+    color: inherit;
+    box-shadow: inset 0 0 1rem;
     display: inline-block;
 }
 
 .betting-box:hover .allow-bet {
     visibility: visible;
-}
-
-.betting-box:hover {
-    background-color: #aaa;
 }
 
 .card-list {
@@ -182,11 +204,28 @@ main {
     height: 3rem;
     line-height: 3rem;
     font-size: 2rem;
-    transition: background-color 0.3s;
+}
+
+#start-button {
+    color:var(--table-background-color);
+    background-color: var(--general-text-color);
+    padding: 0 1rem;
+    border-radius: 3rem;
+    transition: background-color .15s, color .15s;
+}
+
+#dealer-message {
+    transition: transform .3s, color .3s;
+}
+
+.cannot-start {
+    transform: scale(1.5);
+    color: var(--erroneous);
 }
 
 #start-button:active {
-    background-color: #aaa0;
+    background-color: #0000;
+    color:var(--general-text-color);
 }
 
 #face-down {

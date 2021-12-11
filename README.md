@@ -35,11 +35,15 @@ DESCRIPTION
 
 -   ### Design
     -   #### Colour Scheme
-        -   The two main colours used are
+        -   Sepia #784a10
+        -   Dark Spring Green #1d7c4e
+        -   Vivid Tangerine #f99f8b
+        -   Light Goldenrod Yellow #eaf0ce
+        -   Languid Lavender #c2b8cc
     -   #### Typography
         -   
     -   #### Imagery
-        -   
+        -   The only image used are the back of the card. See [credits](#media)
 *   ### Wireframes
 
     -   Small Screen Wireframe - [View](https://)
@@ -205,6 +209,7 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 ### Media
 
 -   Back of card from [pixabay](https://pixabay.com/photos/playing-card-back-template-568200/)
+-   To find matching colors [Coolors](https://coolors.co/1d7c4e-fccfc5-eaf0ce-d6d0dc-784a10)
 
 ### Acknowledgements
 

@@ -21,6 +21,7 @@ const MAX_BET = 100,
     BET_INTERVAL_FREQUENCY = 5,
     BLACKJACK = 21,
     DEALER_MSG_TIMEOUT = 2000,
+    TOGGLE_MSG_INTERVAL = 300,
     BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg';
 
 const gameState = {
@@ -99,7 +100,10 @@ const gameProperties = {
 // Game Course methods and initiators
 // __________________________________
 function advanceBettingPhase() {
-    if (gameState.betBoxes.size < 2) throw new Error('Should not be able to advance betting phase')
+    if (gameState.betBoxes.size < 2) {
+        dealerMsgEmphasize()
+        return 
+    }
     gameState.continuePhase()
     unloadBettingPhase()
     loadDealingPhase()
@@ -303,7 +307,7 @@ function flipDealerCard(dealerBox) {
 
     const imgWrapper = dealerBox.getElementsByTagName('span')[0]
 
-    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up alt='The back side of a card'">`
+    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up" alt="The back side of a card">`
 
     document.getElementById('face-up').addEventListener('load', ()=>{
         dealerBox.querySelectorAll('span > img').forEach(card=>card.classList.toggle('flip'))
@@ -395,6 +399,7 @@ function resetGame() {
 
 // Game UI modifiers
 // _________________________________
+
 // allow player to place bets on betting phase
 function updatePot(betBox) {
     if (betBox)
@@ -414,6 +419,14 @@ function loadBettingPhase() {
     showDealerMsg('Place your bets please')
     document.getElementById('start-button').style.visibility = 'visible'
 }
+
+function dealerMsgEmphasize() {
+    const dealerMsg = document.getElementById('dealer-message')
+    const toggle = ()=>dealerMsg.classList.toggle('cannot-start')
+    toggle()
+    setTimeout(toggle, TOGGLE_MSG_INTERVAL)
+}
+
 // disable bets
 function unloadBettingPhase() {
     const betButtons = document.getElementsByClassName('bet')
