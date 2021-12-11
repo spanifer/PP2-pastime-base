@@ -201,6 +201,7 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 -   [MDN Web Docs](https://developer.mozilla.org/)
 -   [Fetch API usage](https://github.com/mdn/fetch-examples/blob/master/fetch-request/index.html)
 -   [JSdoc manual](https://jsdoc.app/tags-param.html)
+-   [Is it a Promise?](https://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise)
 
 ### Content
 

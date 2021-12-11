@@ -188,7 +188,6 @@ function initEvaluationPhase() {
 function selectNextBox() {
     gameState.currentBetBox = gameState.betBoxIterator.next()
     if (gameState.currentBetBox.done) {
-        console.log('Now run the dealer turn')
         initDealerTurn()
     } else {
         runEvaluation()
@@ -217,17 +216,17 @@ function setPlayerActions(availableActions) {
 }
 
 function handlePlayerAction(ev) {
-    console.log('clicked on', ev.target.id)
-    if (!action.hasOwnProperty(ev.target.id)) {
-        console.error('Miss clicked action')
-        return
-    }
-    action[ev.target.id](ev)
+    if (!action.hasOwnProperty(ev.target.id)) return
+
+    document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
+    Promise.resolve(action[ev.target.id](ev))
+    .then(()=>
+        document.getElementById('player-action').addEventListener('click', handlePlayerAction))
 }
 
 const action = {
     hit: function(){
-        drawCards().then(resp=>{
+        return drawCards().then(resp=>{
             const card = resp.cards[0]
             const betBox = gameState.currentBetBox.value
             const boxState = gameState.betBoxes.get(betBox)
@@ -249,7 +248,7 @@ const action = {
         const potValue = gameState.player.getPot(betBox)
         gameState.player.addToPot(betBox, potValue)
 
-        drawCards().then(resp=>{
+        return drawCards().then(resp=>{
             const card = resp.cards[0]
             const boxState = gameState.betBoxes.get(betBox)
 

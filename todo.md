@@ -14,11 +14,10 @@
 
     - 33 - 26
 
-1. Add facedown card
-1. ~~Add image on load~~ & Game phase timing
 1. Highlight active betbox
 1. Pause menu modal? what is pause?
 1. Out of cash?
+1. Add orientation landscape to remove bet buttons display
 1. Add meta tags
 1. Card dealing animation as it flies over the table?
 
