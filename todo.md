@@ -15,10 +15,7 @@
     - 33 - 26
 
 1. Add facedown card
-1. Add image on load & Game phase timing
-    1. when dealing
-    1. when draws a card
-    1. when dealer draws own cards
+1. ~~Add image on load~~ & Game phase timing
 1. Highlight active betbox
 1. Pause menu modal? what is pause?
 1. Out of cash?

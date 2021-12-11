@@ -317,8 +317,16 @@ function dealerResponse(isWin) {
 
 function initDealerTurn() {
     document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
+
+    gameState.possibleWinBoxes = getPlayBoxesDirection()
+    .filter(betBox=>gameState.betBoxes.get(betBox).cardsValue() <= 21)
+
     flipDealerCard(document.getElementById('dealer'))
-    setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT)
+
+    if (gameState.possibleWinBoxes.length > 0)
+        setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT)
+    else 
+        setTimeout(resetGame, DEALER_MSG_TIMEOUT)
 }
 
 function flipDealerCard(dealerBox) {
@@ -359,11 +367,11 @@ function initConclusion(dealerBox) {
 
     const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
 
-    const betBoxes = getPlayBoxesDirection().values()
-
-    conclude()
+    const betBoxes = gameState.possibleWinBoxes.values()
 
     showDealerMsg()
+    
+    conclude()
 
     function conclude () {
         const iteration = betBoxes.next()
@@ -400,7 +408,6 @@ function concludeBet(betBox, status) {
         player.cash += player.getPot(betBox)
     }
     
-
     dealerMsgElem.innerText = status
     dealerMsgEmphasize()
     // will clear pot list
