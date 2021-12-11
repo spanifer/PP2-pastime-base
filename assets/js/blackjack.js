@@ -1,3 +1,4 @@
+// api specific ID
 let deckID;
 
 window.addEventListener('load', function() {
@@ -95,7 +96,6 @@ const gameProperties = {
         let val;
         if (val = parseInt(cardName)) return val;
         if (this.highCards.includes(cardName)) return 10;
-        else return [1,11]
     },
 }
 
@@ -589,7 +589,7 @@ function mouseupEvHandler (closure) {
 }
 
 function betOperation (closure) {
-    let {betBox, pot, betButton:{dataset:{type}}, recursionCount:count} = closure
+    let {betBox, betButton:{dataset:{type}}, recursionCount:count} = closure
     let potValue = gameState.player.getPot(betBox)
     if (!potValue && potValue !== 0) {
         console.error('Something went terribly wrong with bet value: ', potValue)
@@ -618,4 +618,6 @@ function betOperation (closure) {
     }
 
     updateCashAndPot(betBox)
-} 
+}
+
+document.getElementById('start-button').addEventListener('click', advanceBettingPhase)
