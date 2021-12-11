@@ -31,6 +31,7 @@ const gameState = {
     player : new Player({cash:250}),
     continuePhase: function () {
         if (++this.phase >= this.acceptedPhases.length) this.phase = 0;
+        document.getElementById('game-wrapper').dataset.phase = this.getPhase()
     },
     getPhase: function () {
         return this.acceptedPhases[this.phase]
@@ -326,8 +327,10 @@ function initDealerTurn() {
 
     if (gameState.possibleWinBoxes.length > 0)
         setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT)
-    else 
+    else {
+        gameState.continuePhase()
         setTimeout(resetGame, DEALER_MSG_TIMEOUT)
+    }
 }
 
 function flipDealerCard(dealerBox) {
@@ -464,7 +467,7 @@ function loadBettingPhase() {
         buttonsWrapper.classList.add('allow-bet')
     }
     showDealerMsg('Place your bets please')
-    document.getElementById('start-button').style.visibility = 'visible'
+    document.getElementById('start-button').style.visibility = 'visible';
 }
 
 function dealerMsgEmphasize() {
