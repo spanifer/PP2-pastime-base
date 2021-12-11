@@ -420,6 +420,11 @@ function concludeBet(betBox, status) {
 }
 
 function resetGame() {
+    if (gameState.player.cash === 0) {
+        alert('You have lost all of your game tokens. Could be worse. For now you can refresh the page and try again.')
+        return
+    }
+
     gameState.betBoxes.forEach((val,key) => {
         key.getElementsByClassName('card-list')[0].innerHTML = ''
         key.getElementsByClassName('cards-value')[0].innerHTML = ''

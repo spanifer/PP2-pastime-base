@@ -20,19 +20,6 @@ DESCRIPTION
 <h2 id="user-experience">User Experience (UX)</h2>
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
 
--   ### User stories
-
-    -   #### First Time Visitor Goals
-
-        1. As a First Time Visitor, I want to 
-
-    -   #### Returning Visitor Goals
-
-        1. As a Returning Visitor, I want to
-
-    -   #### Frequent User Goals
-        1. As a Frequent User, I want to
-
 -   ### Design
     -   #### Colour Scheme
         -   Sepia #784a10
@@ -40,15 +27,9 @@ DESCRIPTION
         -   Vivid Tangerine #f99f8b
         -   Light Goldenrod Yellow #eaf0ce
         -   Languid Lavender #c2b8cc
-    -   #### Typography
-        -   
     -   #### Imagery
         -   The only image used are the back of the card. See [credits](#media)
 *   ### Wireframes
-
-    -   Small Screen Wireframe - [View](https://)
-
-    -   Medium Screen Wireframe - [View](https://)
 
     -   Large Screen Wireframe - [View](assets/readme/wireframes/large-screen-size.png)
 
@@ -91,48 +72,6 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 -   [W3C Markup Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
 -   [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
 
-### Testing User Stories from User Experience (UX) Section
-
--   #### First Time Visitor Goals
-
-    1. As a First Time Visitor, I want to
-
-        1. 
-
-    2. As a First Time Visitor, I want to
-
-        1. 
-
-    3. As a First Time Visitor, I want to
-
-        1. 
-
--   #### Returning Visitor Goals
-
-    1. As a Returning Visitor, I want to
-
-        1. 
-
-    2. As a Returning Visitor, I want to
-
-        1. 
-
-    3. As a Returning Visitor, I want to
-        1. 
-
--   #### Frequent User Goals
-
-    1. As a Frequent User, I want to
-
-        1. 
-
-    2. As a Frequent User, I want to
-
-        1. 
-
-    3. As a Frequent User, I want to
-        1. 
-
 ### Further Testing
 
 -   The Website was tested on Google Chrome, Internet Explorer, Microsoft Edge and Safari browsers.
@@ -153,7 +92,6 @@ The project was deployed to GitHub Pages using the following steps...
 
 1. Log in to GitHub and locate the [GitHub Repository](https://github.com/)
 2. At the top of the Repository (not top of page), locate the "Settings" Button on the menu.
-    - Alternatively Click [Here](https://raw.githubusercontent.com/) for a GIF demonstrating the process starting from Step 2.
 3. Scroll down the Settings page until you locate the "GitHub Pages" Section.
 4. Under "Source", click the dropdown called "None" and select "Master Branch".
 5. The page will automatically refresh.
@@ -202,16 +140,17 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 -   [Fetch API usage](https://github.com/mdn/fetch-examples/blob/master/fetch-request/index.html)
 -   [JSdoc manual](https://jsdoc.app/tags-param.html)
 -   [Is it a Promise?](https://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise)
+-   [How to disable text selection](https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting)
 
 ### Content
 
--   Psychological properties of colours text in the README.md was found [here](http://www.colour-affects.co.uk/psychological-properties-of-colours)
+-   All content was written by the developer.
+-   To find matching colors [Coolors](https://coolors.co/1d7c4e-fccfc5-eaf0ce-d6d0dc-784a10)
 
 ### Media
 
 -   Back of card from [pixabay](https://pixabay.com/photos/playing-card-back-template-568200/)
--   To find matching colors [Coolors](https://coolors.co/1d7c4e-fccfc5-eaf0ce-d6d0dc-784a10)
 
 ### Acknowledgements
 
--   My Mentor for continuous helpful feedback.
+-   My Mentor for continuous helpful feedback, and the idea to utilize an API.
