@@ -403,12 +403,12 @@ function resetGame() {
 // allow player to place bets on betting phase
 function updatePot(betBox) {
     if (betBox)
-    betBox.getElementsByClassName('pot')[0].innerText = gameState.player.getPot(betBox) || ''
+    betBox.getElementsByClassName('pot')[0].innerHTML = gameState.player.getPot(betBox)?`<i class="fas fa-coins"></i> ${gameState.player.getPot(betBox)}`:''
 }
 
 function updateCashAndPot(betBox) {
     updatePot(betBox)
-    document.getElementById('player-cash').innerText = gameState.player.cash
+    document.getElementById('player-cash').innerHTML = `<i class="fas fa-coins"></i> ${gameState.player.cash}`
 }
 
 function loadBettingPhase() {
