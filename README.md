@@ -1,10 +1,10 @@
-<h1 align="center">MAIN_TITLE</h1>
+<h1 align="center">Pastime Blackjack</h1>
 
-[View the live project here.](https://)
+[View the live project here.](https://spanifer.github.io/PP2-pastime-base/)
 
-DESCRIPTION
+A use of the deck of card API and the implementation of the general Blackjack game rules. The user can place bets on all three bet positions, and will most likely be eliminated by the not too smart dealer anyway. It is a game of chances.
 
-![Responsive Design from http://ami.responsivedesign.is/]()
+![Responsive Design from http://ami.responsivedesign.is/](assets/readme/images/am-i-responsive.png)
 
 # Table of content
 
@@ -28,7 +28,8 @@ DESCRIPTION
         -   Light Goldenrod Yellow #eaf0ce
         -   Languid Lavender #c2b8cc
     -   #### Imagery
-        -   The only image used are the back of the card. See [credits](#media)
+        -   The back of the card. See [credits](#media)
+        -   Card images are hosted on deckofcards.com
 *   ### Wireframes
 
     -   Large Screen Wireframe - [View](assets/readme/wireframes/large-screen-size.png)
@@ -42,9 +43,33 @@ DESCRIPTION
 
 -   Interactive elements
 
+#### Player bet area
+
+![Playing table](assets/readme/images/blackjack-table.png)
+
+#### Dealer narrates the story
+
+![Dealer message](assets/readme/images/dealer-msg.png)
+
+#### User can place or remove bet by long pressing the buttons
+
+![Wager](assets/readme/images/wager.png)
+
 ### Features left to implement
 
--
+- The player decision Split is not implemented
+
+- Game state to be stored on local storage is not implemented
+
+- Card positioning animation to simulate actual card dealing
+
+- Setting modal
+
+- Game tutorial
+
+- Main landing page
+
+- And probably a lot more
 
 ## Technologies Used
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
@@ -77,7 +102,7 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 
 -   [W3C Markup Validator](https://validator.w3.org/) - Passed without errors
 -   [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - Passed without errors
--   
+-   [JS HINT](https://jshint.com/) - Passed without errors (with ES6)
 
 ### Further Testing
 
@@ -87,7 +112,7 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 
 ### Known Bugs
 
--   
+-   If first hand is a blackjack it is not being evaluated as such
 -   [Flash of unstyled content](https://en.wikipedia.org/wiki/Flash_of_unstyled_content)
 
 ## Deployment
@@ -97,24 +122,24 @@ The W3C Markup Validator and W3C CSS Validator Services were used to validate ev
 
 The project was deployed to GitHub Pages using the following steps...
 
-1. Log in to GitHub and locate the [GitHub Repository](https://github.com/)
+1. Log in to GitHub and locate the [GitHub Repository](https://github.com/spanifer/PP2-pastime-base)
 2. At the top of the Repository (not top of page), locate the "Settings" Button on the menu.
 3. Scroll down the Settings page until you locate the "GitHub Pages" Section.
 4. Under "Source", click the dropdown called "None" and select "Master Branch".
 5. The page will automatically refresh.
-6. Scroll back down through the page to locate the now published site [link](https://github.com) in the "GitHub Pages" section.
+6. Scroll back down through the page to locate the now published site [link](https://spanifer.github.io/PP2-pastime-base/) in the "GitHub Pages" section.
 
 ### Forking the GitHub Repository
 
 By forking the GitHub Repository we make a copy of the original repository on our GitHub account to view and/or make changes without affecting the original repository by using the following steps...
 
-1. Log in to GitHub and locate the [GitHub Repository](https://github.com/)
+1. Log in to GitHub and locate the [GitHub Repository](https://github.com/spanifer/PP2-pastime-base)
 2. At the top of the Repository (not top of page) just above the "Settings" Button on the menu, locate the "Fork" Button.
 3. You should now have a copy of the original repository in your GitHub account.
 
 ### Making a Local Clone
 
-1. Log in to GitHub and locate the [GitHub Repository](https://github.com/)
+1. Log in to GitHub and locate the [GitHub Repository](https://github.com/spanifer/PP2-pastime-base)
 2. Under the repository name, click "Clone or download".
 3. To clone the repository using HTTPS, under "Clone with HTTPS", copy the link.
 4. Open Git Bash
@@ -122,13 +147,13 @@ By forking the GitHub Repository we make a copy of the original repository on ou
 6. Type `git clone`, and then paste the URL you copied in Step 3.
 
 ```
-$ git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+$ git clone https://github.com/spanifer/PP2-pastime-base
 ```
 
 7. Press Enter. Your local clone will be created.
 
 ```
-$ git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+$ git clone https://github.com/spanifer/PP2-pastime-base
 > Cloning into `CI-Clone`...
 > remote: Counting objects: 10, done.
 > remote: Compressing objects: 100% (8/8), done.
@@ -161,3 +186,7 @@ Click [Here](https://help.github.com/en/github/creating-cloning-and-archiving-re
 ### Acknowledgements
 
 -   My Mentor for continuous helpful feedback, and the idea to utilize an API.
+
+## Bio / Side Note
+
+    I should probably mention, here that this is not my first rodeo with JS, although as a hobbyist I never tried too hard to find the right way to code. Even tho that I am familiar with a few concepts, I completely lack the design process and probably good practices. So for me the journey that is given by this course is indescribably valuable.
