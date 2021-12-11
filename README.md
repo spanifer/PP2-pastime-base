@@ -36,9 +36,15 @@ DESCRIPTION
 ## Features
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
 
+### Existing features
+
 -   Responsive on all device sizes
 
 -   Interactive elements
+
+### Features left to implement
+
+-
 
 ## Technologies Used
 <a href="#table-of-content">Click to go back <span style="font-size: 1.5em">🔝</span> to table of content</a>
@@ -69,18 +75,19 @@ DESCRIPTION
 
 The W3C Markup Validator and W3C CSS Validator Services were used to validate every page of the project to ensure there were no syntax errors in the project.
 
--   [W3C Markup Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
--   [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - [Results](https://github.com/)
+-   [W3C Markup Validator](https://validator.w3.org/) - Passed without errors
+-   [W3C CSS Validator](https://jigsaw.w3.org/css-validator/#validate_by_input) - Passed without errors
+-   
 
 ### Further Testing
 
 -   The Website was tested on Google Chrome, Internet Explorer, Microsoft Edge and Safari browsers.
 -   The website was viewed on a variety of devices such as Desktop, Laptop, iPhone7, iPhone 8 & iPhoneX.
--   A large amount of testing was done to ensure that all pages were linking correctly.
 -   Friends and family members were asked to review the site and documentation to point out any bugs and/or user experience issues.
 
 ### Known Bugs
 
+-   
 -   [Flash of unstyled content](https://en.wikipedia.org/wiki/Flash_of_unstyled_content)
 
 ## Deployment

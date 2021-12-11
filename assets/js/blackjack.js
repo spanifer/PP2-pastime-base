@@ -2,7 +2,7 @@
 let deckID;
 
 window.addEventListener('load', function() {
-    deckID = localStorage.getItem('deckID')
+    deckID = localStorage.getItem('deckID');
 
     if (!deckID) {
         // get a new shuffled deck
@@ -10,12 +10,12 @@ window.addEventListener('load', function() {
         .then(json=>{
             deckID = json.deck_id;
             localStorage.setItem('deckID',json.deck_id);
-        })
+        });
     }
 
-    resetPlayerActions()
-    resetGame()
-})
+    resetPlayerActions();
+    resetGame();
+});
 
 const MAX_BET = 100,
     BET_OPERATION_INTERVAL = 100,
@@ -26,67 +26,126 @@ const MAX_BET = 100,
     DEALING_TIMEOUT = 500,
     BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg';
 
+
+class Player {
+    constructor (...{name = 'noname', cash = 250}) {
+        this.name = name;
+        this.cash = cash;
+        //to store active pot elements with its bet value
+        this.potList = new Map();
+    }
+}
+
+Player.prototype.getPot = function (bettingBox) {
+    return this.potList.get(bettingBox);
+};
+
+Player.prototype.addPot = function (bettingBox, potValue) {
+    this.potList.set(bettingBox, potValue);
+};
+
+Player.prototype.removePot = function (bettingBox) {
+    this.potList.delete(bettingBox);
+};
+
+Player.prototype.resetPotList = function () {
+    this.potList.clear();
+};
+
+const mod = Symbol('modify');
+/**
+ * Replaces a Map.set(key, Map.get(key) + value)
+ * instead it is
+ * Map[mod](key, (currentVal)=>currentVal+value)
+ * @param {Map.key} key 
+ * @param {Number|Function} cb - to run or sum with this[key].value
+ */
+Map.prototype[mod] = function (key, cb) {
+    if (typeof cb === 'function')
+        this.set(key, cb(this.get(key)));
+    else if (typeof cb === 'number')
+        this.set(key, this.get(key) + cb);
+};
+
+/**
+ * Modifies Player pot and cash according to bet value if possible
+ * @param {HTMLDivElement} bettingBox 
+ * @param {Number} betValue - negative integer to remove from pot, positive to add to pot
+ */
+Player.prototype.addToPot = function (bettingBox, betValue) {
+    if (this.getPot(bettingBox) + betValue < 0) { // if trying to remove from pot more than available
+        this.cash += this.getPot(bettingBox);
+        this.addPot(bettingBox, 0);
+    } else if (this.cash - betValue < 0) { // if trying to add to pot more 
+        this.potList[mod](bettingBox, this.cash);
+        this.cash = 0;
+    } else {
+        this.cash -= betValue;
+        this.potList[mod](bettingBox, betValue);
+    }
+};
+
 const gameState = {
     phase: -1,
     acceptedPhases: ['betting', 'dealing', 'evaluate', 'conclude'],
     player : new Player({cash:250}),
     continuePhase: function () {
         if (++this.phase >= this.acceptedPhases.length) this.phase = 0;
-        document.getElementById('game-wrapper').dataset.phase = this.getPhase()
+        document.getElementById('game-wrapper').dataset.phase = this.getPhase();
     },
     getPhase: function () {
-        return this.acceptedPhases[this.phase]
+        return this.acceptedPhases[this.phase];
     },
     betBoxes: new Map(),
     resetBetBoxes: function (){
-        this.betBoxes.clear()
-        this.betBoxes.set(document.getElementById('dealer'), new Cards())
+        this.betBoxes.clear();
+        this.betBoxes.set(document.getElementById('dealer'), new Cards());
     },
-}
+};
 
 // first element in the list is always the dealer box
-gameState.resetBetBoxes()
+gameState.resetBetBoxes();
 
 function Cards () {
-    this.cards = []
-    this.currentCardsValue = 0
-    this.cardsValueChanged = false
+    this.cards = [];
+    this.currentCardsValue = 0;
+    this.cardsValueChanged = false;
 }
 
 Cards.prototype.push = function (card) {
-    this.cards.push(card)
-    this.cardsValueChanged = true
-}
+    this.cards.push(card);
+    this.cardsValueChanged = true;
+};
 
 Cards.prototype.addCard = function (cb) {
     drawCards(1).then(resp=>{
-        this.cards.push(resp.cards[0])
-        this.cardsValueChanged = true
-        return resp.cards[0]
-    }).then(cb)
-}
+        this.cards.push(resp.cards[0]);
+        this.cardsValueChanged = true;
+        return resp.cards[0];
+    }).then(cb);
+};
 
 Cards.prototype.cardsValue = function () {
-    if (! this.cardsValueChanged) return this.currentCardsValue
+    if (! this.cardsValueChanged) return this.currentCardsValue;
     // reduce cards to an object where card values are summed and aces are sorted separately
     const {fixedValue, aces} = this.cards
     .reduce((sortedCards,card)=>{
-        const value = gameProperties.getCardGameValue(card.value)
-        if (typeof value === 'number') sortedCards.fixedValue += value
-        else sortedCards.aces.push(card)
-        return sortedCards
-    },{fixedValue:0,aces:[]})
+        const value = gameProperties.getCardGameValue(card.value);
+        if (typeof value === 'number') sortedCards.fixedValue += value;
+        else sortedCards.aces.push(card);
+        return sortedCards;
+    },{fixedValue:0,aces:[]});
     
-    let cardsValue = fixedValue
+    let cardsValue = fixedValue;
     
     // only add high ace value if it is not over BLACKJACK value
     aces.forEach(ace=>cardsValue += 
-        aces.length+10+cardsValue > BLACKJACK ? 1 : 11)
+        aces.length+10+cardsValue > BLACKJACK ? 1 : 11);
     
-    this.currentCardsValue = cardsValue
-    this.cardsValueChanged = false
-    return cardsValue
-}
+    this.currentCardsValue = cardsValue;
+    this.cardsValueChanged = false;
+    return cardsValue;
+};
 
 const gameProperties = {
     // This is a list of card values that the api will return for each card
@@ -94,258 +153,258 @@ const gameProperties = {
     highCards: ["JACK","QUEEN","KING"],
     getCardGameValue: function(cardName) {
         let val;
-        if (val = parseInt(cardName)) return val;
+        if ((val = parseInt(cardName))) return val;
         if (this.highCards.includes(cardName)) return 10;
     },
-}
+};
 
 // Game Course methods and initiators
 // __________________________________
 function advanceBettingPhase() {
     if (gameState.betBoxes.size < 2) {
-        dealerMsgEmphasize()
-        return 
+        dealerMsgEmphasize();
+        return;
     }
-    gameState.continuePhase()
-    unloadBettingPhase()
-    loadDealingPhase()
-    initDealingPhase()
+    gameState.continuePhase();
+    unloadBettingPhase();
+    loadDealingPhase();
+    initDealingPhase();
 }
 
 function initDealingPhase() {
     drawCards(gameState.betBoxes.size * 2)
     .then(apiResponse => {
-        if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ')
-        dealCards(apiResponse)
-    })
+        if (!apiResponse.success) throw new Error('Something is not right with the drawn cards. ');
+        dealCards(apiResponse);
+    });
 }
 
 function getPlayBoxesDirection() {
     return [...document.getElementsByClassName('betting-box')]
-    .reverse().filter(betBox=>gameState.betBoxes.has(betBox))
+    .reverse().filter(betBox=>gameState.betBoxes.has(betBox));
 }
 
 function dealCards(docAPI) {
 
-    const betBoxes = getPlayBoxesDirection()
+    const betBoxes = getPlayBoxesDirection();
 
-    betBoxes.push(document.getElementById('dealer'))
+    betBoxes.push(document.getElementById('dealer'));
 
-    const cards = docAPI.cards
+    const cards = docAPI.cards;
 
-    const cardIter = cards.entries()
+    const cardIter = cards.entries();
 
-    dealNextCard()
+    dealNextCard();
 
     function dealNextCard() {
 
-        const [i, card] = cardIter.next().value
+        const [i, card] = cardIter.next().value;
         if (i === docAPI.cards.length - 1) {
-            dealerFaceDownCard()
-            return
+            dealerFaceDownCard();
+            return;
         }
 
-        const betBox = betBoxes[i % betBoxes.length]
-        addCardImage(betBox, card)
+        const betBox = betBoxes[i % betBoxes.length];
+        addCardImage(betBox, card);
         
-        let boxState
-        if (boxState = gameState.betBoxes.get(betBox)) 
-            boxState.push(card)
+        let boxState;
+        if ((boxState = gameState.betBoxes.get(betBox)))
+            boxState.push(card);
         else
-        throw new TypeError('Bet box does not exist!')
+        throw new TypeError('Bet box does not exist!');
         
-        updateCardsGameValue(betBox)
+        updateCardsGameValue(betBox);
 
-        setTimeout(dealNextCard,DEALING_TIMEOUT)
+        setTimeout(dealNextCard,DEALING_TIMEOUT);
 
     }
 
     function dealerFaceDownCard() {
 
         // dealer last card face-down
-        const betBox = betBoxes[betBoxes.length-1]
-        const div = document.createElement('div')
-        div.classList.add('two-faced', 'playing-card')
-        div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" class="face-down"  alt="The back side of a card">`
+        const betBox = betBoxes[betBoxes.length-1];
+        const div = document.createElement('div');
+        div.classList.add('two-faced', 'playing-card');
+        div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" class="face-down"  alt="The back side of a card">`;
 
-        betBox.getElementsByClassName('card-list')[0].appendChild(div)
+        betBox.getElementsByClassName('card-list')[0].appendChild(div);
 
-        gameState.dealerFaceDownCard = cards[cards.length-1]
+        gameState.dealerFaceDownCard = cards[cards.length-1];
 
-        initEvaluationPhase()
+        initEvaluationPhase();
     }
 }
     
 function initEvaluationPhase() {
-    gameState.continuePhase()
-    const betBoxes = getPlayBoxesDirection()
+    gameState.continuePhase();
+    const betBoxes = getPlayBoxesDirection();
     
-    gameState.betBoxIterator = betBoxes.values()
-    document.getElementById('player-action').addEventListener('click', handlePlayerAction)
+    gameState.betBoxIterator = betBoxes.values();
+    document.getElementById('player-action').addEventListener('click', handlePlayerAction);
     
-    selectNextBox()
+    selectNextBox();
 }
 
 function selectNextBox() {
-    if (gameState.currentBetBox) toggleActiveBox(gameState.currentBetBox.value)
-    gameState.currentBetBox = gameState.betBoxIterator.next()
+    if (gameState.currentBetBox) toggleActiveBox(gameState.currentBetBox.value);
+    gameState.currentBetBox = gameState.betBoxIterator.next();
     if (gameState.currentBetBox.done) {
-        initDealerTurn()
+        initDealerTurn();
     } else {
-        toggleActiveBox(gameState.currentBetBox.value)
-        runEvaluation()
+        toggleActiveBox(gameState.currentBetBox.value);
+        runEvaluation();
     }
 }
 
 function runEvaluation() {
-    const evalResult = evaluateBox(gameState.currentBetBox.value)
+    const evalResult = evaluateBox(gameState.currentBetBox.value);
     if (typeof evalResult === 'boolean') {
-        dealerResponse(evalResult)
-        showDealerMsg()
+        dealerResponse(evalResult);
+        showDealerMsg();
         setTimeout(()=>{
-            selectNextBox()
-            hideDealerMsg()
-        },DEALER_MSG_TIMEOUT)
+            selectNextBox();
+            hideDealerMsg();
+        },DEALER_MSG_TIMEOUT);
     } else {
-        setPlayerActions(evalResult)
+        setPlayerActions(evalResult);
     }
 }
 
 function setPlayerActions(availableActions) {
     for (const action of availableActions) {
-        const actionElem = document.getElementById(action)
-        actionElem.style.visibility = 'visible'
+        const actionElem = document.getElementById(action);
+        actionElem.style.visibility = 'visible';
     }
 }
 
 function handlePlayerAction(ev) {
-    if (!action.hasOwnProperty(ev.target.id)) return
+    if (!action.hasOwnProperty(ev.target.id)) return;
 
-    document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
+    document.getElementById('player-action').removeEventListener('click', handlePlayerAction);
     Promise.resolve(action[ev.target.id](ev))
     .then(()=>
-        document.getElementById('player-action').addEventListener('click', handlePlayerAction))
+        document.getElementById('player-action').addEventListener('click', handlePlayerAction));
 }
 
 const action = {
     hit: function(){
         return drawCards().then(resp=>{
-            const card = resp.cards[0]
-            const betBox = gameState.currentBetBox.value
-            const boxState = gameState.betBoxes.get(betBox)
+            const card = resp.cards[0];
+            const betBox = gameState.currentBetBox.value;
+            const boxState = gameState.betBoxes.get(betBox);
 
-            addCardImage(betBox, card)
-            boxState.push(card)
-            updateCardsGameValue(betBox)
+            addCardImage(betBox, card);
+            boxState.push(card);
+            updateCardsGameValue(betBox);
 
-            resetPlayerActions()
-            runEvaluation()
-        })
+            resetPlayerActions();
+            runEvaluation();
+        });
     },
     stand: function(){
-        resetPlayerActions()
-        selectNextBox()
+        resetPlayerActions();
+        selectNextBox();
     },
     double: function(){
-        const betBox = gameState.currentBetBox.value
-        const potValue = gameState.player.getPot(betBox)
-        gameState.player.addToPot(betBox, potValue)
+        const betBox = gameState.currentBetBox.value;
+        const potValue = gameState.player.getPot(betBox);
+        gameState.player.addToPot(betBox, potValue);
 
         return drawCards().then(resp=>{
-            const card = resp.cards[0]
-            const boxState = gameState.betBoxes.get(betBox)
+            const card = resp.cards[0];
+            const boxState = gameState.betBoxes.get(betBox);
 
-            addCardImage(betBox, card)
-            boxState.push(card)
-            updateCardsGameValue(betBox)
-            updateCashAndPot(betBox)
+            addCardImage(betBox, card);
+            boxState.push(card);
+            updateCardsGameValue(betBox);
+            updateCashAndPot(betBox);
 
-            resetPlayerActions()
-            selectNextBox()
-        })
+            resetPlayerActions();
+            selectNextBox();
+        });
     },
     split: function(ev){
-        ev.target.innerText = 'Feature not implemented'
+        ev.target.innerText = 'Feature not implemented';
         setTimeout(()=>{
-            ev.target.style.visibility = 'hidden'
-            ev.target.innerText = 'Split'
-        },DEALER_MSG_TIMEOUT)
+            ev.target.style.visibility = 'hidden';
+            ev.target.innerText = 'Split';
+        },DEALER_MSG_TIMEOUT);
     },
     surrender: function(){
-        const betBox = gameState.currentBetBox.value
-        const potValue = gameState.player.getPot(betBox)
+        const betBox = gameState.currentBetBox.value;
+        const potValue = gameState.player.getPot(betBox);
 
-        gameState.player.addToPot(betBox, -Math.floor(potValue / 2))
-        updateCashAndPot(betBox)
+        gameState.player.addToPot(betBox, -Math.floor(potValue / 2));
+        updateCashAndPot(betBox);
         
-        resetPlayerActions()
-        selectNextBox()
+        resetPlayerActions();
+        selectNextBox();
     }
-}
+};
 
 /**
  * @param {HTMLDivElement} betBox
  * @returns {Array|Boolean} available player actions id list or false on bust, true on win
  */
 function evaluateBox(betBox) {
-    const thisBox = gameState.betBoxes.get(betBox)
-    const isFirstAction = thisBox.cards.length === 2
-    const cardsValue = thisBox.cardsValue()
-    const playerActions = ["hit","stand","double","split","surrender"]
+    const thisBox = gameState.betBoxes.get(betBox);
+    const isFirstAction = thisBox.cards.length === 2;
+    const cardsValue = thisBox.cardsValue();
+    const playerActions = ["hit","stand","double","split","surrender"];
     if (cardsValue > BLACKJACK) {
-        return false
+        return false;
     } else if (cardsValue === BLACKJACK) {
-        return true
+        return true;
     } else {
         if (isFirstAction) {
             if (thisBox.cards[0].value !== thisBox.cards[1].value)
-                playerActions.splice(playerActions.indexOf('split'),1)
+                playerActions.splice(playerActions.indexOf('split'),1);
             if (gameState.player.cash / gameState.player.getPot(betBox) < 1)
-                playerActions.splice(playerActions.indexOf('double'),1)
-            return playerActions
+                playerActions.splice(playerActions.indexOf('double'),1);
+            return playerActions;
         } else 
-            return playerActions.slice(0,2)
+            return playerActions.slice(0,2);
     }
 }
 
 function dealerResponse(isWin) {
-    const dealerMsg = document.getElementById('dealer-message')
+    const dealerMsg = document.getElementById('dealer-message');
     if (isWin) {
-        dealerMsg.innerText = 'Blackjack!'
+        dealerMsg.innerText = 'Blackjack!';
     } else {
-        dealerMsg.innerText = 'That\'s a Bust!'
+        dealerMsg.innerText = 'That\'s a Bust!';
     }
 }
 
 function initDealerTurn() {
-    document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
+    document.getElementById('player-action').removeEventListener('click', handlePlayerAction);
 
     gameState.possibleWinBoxes = getPlayBoxesDirection()
-    .filter(betBox=>gameState.betBoxes.get(betBox).cardsValue() <= 21)
+    .filter(betBox=>gameState.betBoxes.get(betBox).cardsValue() <= 21);
 
-    flipDealerCard(document.getElementById('dealer'))
+    flipDealerCard(document.getElementById('dealer'));
 
     if (gameState.possibleWinBoxes.length > 0)
-        setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT)
+        setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT);
     else {
-        gameState.continuePhase()
-        setTimeout(resetGame, DEALER_MSG_TIMEOUT)
+        gameState.continuePhase();
+        setTimeout(resetGame, DEALER_MSG_TIMEOUT);
     }
 }
 
 function flipDealerCard(dealerBox) {
-    const dealerCards = gameState.betBoxes.get(dealerBox)
-    dealerCards.push(gameState.dealerFaceDownCard)
+    const dealerCards = gameState.betBoxes.get(dealerBox);
+    dealerCards.push(gameState.dealerFaceDownCard);
 
-    const imgWrapper = dealerBox.getElementsByClassName('two-faced')[0]
+    const imgWrapper = dealerBox.getElementsByClassName('two-faced')[0];
 
-    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" class="face-up">`
+    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" class="face-up">`;
 
     imgWrapper.getElementsByClassName('face-up')[0].addEventListener('load', ()=>{
-        [...imgWrapper.children].forEach(card=>card.classList.toggle('flip'))
-    })
+        [...imgWrapper.children].forEach(card=>card.classList.toggle('flip'));
+    });
 
-    updateCardsGameValue(dealerBox)
+    updateCardsGameValue(dealerBox);
 }
 
 /**
@@ -355,100 +414,100 @@ function dealerDecision(dealerBox) {
     // not too bright dealer only draws card if cardsValue is less than <18
     if (gameState.betBoxes.get(dealerBox).cardsValue() < 18) {
         drawCards().then(resp=>{
-            const card = resp.cards[0]
-            gameState.betBoxes.get(dealerBox).push(card)
-            addCardImage(dealerBox, card)
-            updateCardsGameValue(dealerBox)
-            setTimeout(dealerDecision.bind(null,dealerBox))
-        })
+            const card = resp.cards[0];
+            gameState.betBoxes.get(dealerBox).push(card);
+            addCardImage(dealerBox, card);
+            updateCardsGameValue(dealerBox);
+            setTimeout(dealerDecision.bind(null,dealerBox));
+        });
     } else {
-        setTimeout(initConclusion.bind(null,dealerBox))
+        setTimeout(initConclusion.bind(null,dealerBox));
     }
 }
 
 function initConclusion(dealerBox) {
-    gameState.continuePhase()
+    gameState.continuePhase();
 
-    const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
+    const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue();
 
-    const betBoxes = gameState.possibleWinBoxes.values()
+    const betBoxes = gameState.possibleWinBoxes.values();
 
-    showDealerMsg()
+    showDealerMsg();
     
-    conclude()
+    conclude();
 
     function conclude () {
-        const iteration = betBoxes.next()
+        const iteration = betBoxes.next();
         if (iteration.done) {
-            resetGame()
-            return
+            resetGame();
+            return;
         }
 
-        const betBox = iteration.value
+        const betBox = iteration.value;
 
-        toggleActiveBox(betBox)
+        toggleActiveBox(betBox);
 
-        const playerValue = gameState.betBoxes.get(betBox).cardsValue()
+        const playerValue = gameState.betBoxes.get(betBox).cardsValue();
         if (playerValue > BLACKJACK) {
-            concludeBet(betBox,'lose')
+            concludeBet(betBox,'lose');
         } else if (dealerValue > BLACKJACK) {
-            concludeBet(betBox,'win')
+            concludeBet(betBox,'win');
         } else if (playerValue > dealerValue) {
-            concludeBet(betBox,'win')
+            concludeBet(betBox,'win');
         } else if (playerValue === dealerValue) {
-            concludeBet(betBox,'draw')
+            concludeBet(betBox,'draw');
         } else {
-            concludeBet(betBox,'lose')
+            concludeBet(betBox,'lose');
         }
 
-        setTimeout(conclude, DEALER_MSG_TIMEOUT)
+        setTimeout(conclude, DEALER_MSG_TIMEOUT);
     }
 }
 
 function concludeBet(betBox, status) {
-    const player = gameState.player
-    const dealerMsgElem = document.getElementById('dealer-message')
+    const player = gameState.player;
+    const dealerMsgElem = document.getElementById('dealer-message');
     if (status === 'win') {
-        player.cash += player.getPot(betBox) * 2
+        player.cash += player.getPot(betBox) * 2;
     } else if (status === 'draw') {
-        player.cash += player.getPot(betBox)
+        player.cash += player.getPot(betBox);
     }
     
-    dealerMsgElem.innerText = status
-    dealerMsgEmphasize()
+    dealerMsgElem.innerText = status;
+    dealerMsgEmphasize();
     // will clear pot list
 }
 
 function resetGame() {
     if (gameState.player.cash === 0) {
-        alert('You have lost all of your game tokens. Could be worse. For now you can refresh the page and try again.')
-        return
+        alert('You have lost all of your game tokens. Could be worse. For now you can refresh the page and try again.');
+        return;
     }
 
     gameState.betBoxes.forEach((val,key) => {
-        key.getElementsByClassName('card-list')[0].innerHTML = ''
-        key.getElementsByClassName('cards-value')[0].innerHTML = ''
+        key.getElementsByClassName('card-list')[0].innerHTML = '';
+        key.getElementsByClassName('cards-value')[0].innerHTML = '';
     });
-    gameState.betBoxes.clear()
-    gameState.resetBetBoxes()
+    gameState.betBoxes.clear();
+    gameState.resetBetBoxes();
     
     gameState.player.potList.forEach((val,key,map)=>{
-        map.set(key, null)
-        updatePot(key)
-    })
-    gameState.player.resetPotList()
+        map.set(key, null);
+        updatePot(key);
+    });
+    gameState.player.resetPotList();
     
-    gameState.currentBetBox = null
-    resetActiveBoxes()
+    gameState.currentBetBox = null;
+    resetActiveBoxes();
 
-    updateCashAndPot()
+    updateCashAndPot();
 
-    gameState.continuePhase()
+    gameState.continuePhase();
 
-    loadBettingPhase()
+    loadBettingPhase();
     
-    returnCards()
-    shuffleDeck()
+    returnCards();
+    shuffleDeck();
 }
 // _________________________________
 
@@ -458,78 +517,79 @@ function resetGame() {
 // allow player to place bets on betting phase
 function updatePot(betBox) {
     if (betBox)
-    betBox.getElementsByClassName('pot')[0].innerHTML = gameState.player.getPot(betBox)?`<i class="fas fa-coins"></i> ${gameState.player.getPot(betBox)}`:''
+    betBox.getElementsByClassName('pot')[0].innerHTML =
+        gameState.player.getPot(betBox)?`<i class="fas fa-coins"></i> ${gameState.player.getPot(betBox)}`:'';
 }
 
 function updateCashAndPot(betBox) {
-    updatePot(betBox)
-    document.getElementById('player-cash').innerHTML = `<i class="fas fa-coins"></i> ${gameState.player.cash}`
+    updatePot(betBox);
+    document.getElementById('player-cash').innerHTML = `<i class="fas fa-coins"></i> ${gameState.player.cash}`;
 }
 
 function loadBettingPhase() {
-    const betButtons = document.getElementsByClassName('bet')
+    const betButtons = document.getElementsByClassName('bet');
     for (const buttonsWrapper of betButtons) {
-        buttonsWrapper.classList.add('allow-bet')
+        buttonsWrapper.classList.add('allow-bet');
     }
-    showDealerMsg('Place your bets please')
+    showDealerMsg('Place your bets please');
     document.getElementById('start-button').style.visibility = 'visible';
 }
 
 function dealerMsgEmphasize() {
-    const dealerMsg = document.getElementById('dealer-message')
-    const toggle = ()=>dealerMsg.classList.toggle('cannot-start')
-    toggle()
-    setTimeout(toggle, TOGGLE_MSG_INTERVAL)
+    const dealerMsg = document.getElementById('dealer-message');
+    const toggle = ()=>dealerMsg.classList.toggle('cannot-start');
+    toggle();
+    setTimeout(toggle, TOGGLE_MSG_INTERVAL);
 }
 
 // disable bets
 function unloadBettingPhase() {
-    const betButtons = document.getElementsByClassName('bet')
+    const betButtons = document.getElementsByClassName('bet');
     for (const buttonsWrapper of betButtons) {
-        buttonsWrapper.classList.remove('allow-bet')
+        buttonsWrapper.classList.remove('allow-bet');
     }
 }
 
 function toggleActiveBox(betBox) {
-    betBox.classList.toggle('active-box')
+    betBox.classList.toggle('active-box');
 }
 
 function resetActiveBoxes() {
-    [...document.getElementById('betting-area').children].forEach(bb=>bb.classList.remove('active-box'))
+    [...document.getElementById('betting-area').children].forEach(bb=>bb.classList.remove('active-box'));
 }
 
 function loadDealingPhase() {
-    document.getElementById('dealer-message').style.visibility = 'hidden'
-    document.getElementById('start-button').style.visibility = 'hidden'
+    document.getElementById('dealer-message').style.visibility = 'hidden';
+    document.getElementById('start-button').style.visibility = 'hidden';
 }
 
 function updateCardsGameValue(betBox) {
-    const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0]
-    cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).cardsValue()
+    const cardsValueWrapper = betBox.getElementsByClassName('cards-value')[0];
+    cardsValueWrapper.innerText = gameState.betBoxes.get(betBox).cardsValue();
 }
 
 function addCardImage(betBox, apiCardObject) {
     betBox.getElementsByClassName('card-list')[0].innerHTML += 
     `<div class='playing-card'>
     <img src="${apiCardObject.image}" alt="${apiCardObject.value} of ${apiCardObject.suit}">
-</div>`
+</div>`;
 }
 
 // evaluation phase
 function resetPlayerActions() {
     for (const actionElem of document.getElementById('player-action').children) {
-        actionElem.style.visibility = 'hidden'
+        actionElem.style.visibility = 'hidden';
     }
 }
 
 function showDealerMsg(msg) {
-    const dealerMsgElem = document.getElementById('dealer-message')
-    dealerMsgElem.style.visibility = 'visible'
+    const dealerMsgElem = document.getElementById('dealer-message');
+    dealerMsgElem.style.visibility = 'visible';
     if (typeof msg === 'string') dealerMsgElem.innerText = msg;
 }
 
 function hideDealerMsg() {
-    document.getElementById('dealer-message').style.visibility = 'hidden'
+    document.getElementById('dealer-message').style.visibility = 'hidden';
 }
 // _________________________________
 
@@ -538,29 +598,29 @@ function hideDealerMsg() {
 for (const betButtons of document.getElementsByClassName('bet')) {
     for (const betButton of betButtons.children) {
 
-        const betBox = betButton.parentElement.parentElement
-        const pot = betBox.getElementsByClassName('pot')[0]
+        const betBox = betButton.parentElement.parentElement;
+        const pot = betBox.getElementsByClassName('pot')[0];
         const closure = {
             betBox: betBox,
             pot: pot,
             betButton: betButton,
             isPressed: false
-        }
+        };
 
         // make sure not to set listeners multiple times
         if (betButton.dataset.listener !== 'set') {
-            betButton.addEventListener('pointerdown', mousedownEvHandler.bind(null, closure))
-            betButton.addEventListener('pointerup', mouseupEvHandler.bind(null, closure))
-            betButton.addEventListener('pointerleave', mouseupEvHandler.bind(null, closure))
+            betButton.addEventListener('pointerdown', mousedownEvHandler.bind(null, closure));
+            betButton.addEventListener('pointerup', mouseupEvHandler.bind(null, closure));
+            betButton.addEventListener('pointerleave', mouseupEvHandler.bind(null, closure));
         }
-        betButton.dataset.listener = 'set'
+        betButton.dataset.listener = 'set';
     }
 }
 
 function mousedownEvHandler (closure) {
-    let potValue, {betBox} = closure
+    let potValue, {betBox} = closure;
     if (!(potValue = gameState.player.getPot(betBox))) {
-        gameState.player.addPot(betBox, 0)
+        gameState.player.addPot(betBox, 0);
         potValue = 0;
     }
 
@@ -570,54 +630,94 @@ function mousedownEvHandler (closure) {
     // call recursively until mouseup event (or limit value changed in betOperation) changes the isPressed variable
     function executeOperation() {
         if (closure.isPressed) {
-            betOperation(closure)
-            closure.recursionCount++
-            setTimeout(executeOperation,BET_OPERATION_INTERVAL)
+            betOperation(closure);
+            closure.recursionCount++;
+            setTimeout(executeOperation,BET_OPERATION_INTERVAL);
         }
     }
-    executeOperation()
+    executeOperation();
 }
 
 function mouseupEvHandler (closure) {
     closure.isPressed = false;
     closure.recursionCount = null;
     if (gameState.player.getPot(closure.betBox)) {
-        gameState.betBoxes.set(closure.betBox, new Cards())
+        gameState.betBoxes.set(closure.betBox, new Cards());
     } else {
-        gameState.betBoxes.delete(closure.betBox)
+        gameState.betBoxes.delete(closure.betBox);
     }
 }
 
 function betOperation (closure) {
-    let {betBox, betButton:{dataset:{type}}, recursionCount:count} = closure
-    let potValue = gameState.player.getPot(betBox)
+    let {betBox, betButton:{dataset:{type}}, recursionCount:count} = closure;
+    let potValue = gameState.player.getPot(betBox);
     if (!potValue && potValue !== 0) {
-        console.error('Something went terribly wrong with bet value: ', potValue)
+        console.error('Something went terribly wrong with bet value: ', potValue);
         potValue = 0;
     }
-    const operandValue = Math.ceil(count/BET_INTERVAL_FREQUENCY)
+    const operandValue = Math.ceil(count/BET_INTERVAL_FREQUENCY);
     switch (type) {
         case 'add':
             if (potValue + operandValue >= MAX_BET) {
-                gameState.player.addToPot(betBox, MAX_BET-potValue)
-                closure.isPressed = false
+                gameState.player.addToPot(betBox, MAX_BET-potValue);
+                closure.isPressed = false;
             } else {
-                gameState.player.addToPot(betBox, operandValue)
+                gameState.player.addToPot(betBox, operandValue);
             }
-            break
+            break;
         case 'sub':
             if (potValue - operandValue <= 0) {
-                gameState.player.addToPot(betBox, -operandValue)
-                gameState.player.removePot(betBox)
-                closure.isPressed = false
+                gameState.player.addToPot(betBox, -operandValue);
+                gameState.player.removePot(betBox);
+                closure.isPressed = false;
             } else {
-                gameState.player.addToPot(betBox, -operandValue)
+                gameState.player.addToPot(betBox, -operandValue);
             }
-            break
-        default: throw new Error('No such operation.')
+            break;
+        default: throw new Error('No such operation.');
     }
 
-    updateCashAndPot(betBox)
+    updateCashAndPot(betBox);
 }
 
-document.getElementById('start-button').addEventListener('click', advanceBettingPhase)
+document.getElementById('start-button').addEventListener('click', advanceBettingPhase);
+
+/**
+ * @param {string} path - API specific URL path
+ * @link https://deckofcardsapi.com/
+ */
+ function fetchFromAPI (path) {
+    const baseURL = 'https://deckofcardsapi.com/api/deck/';
+
+    return fetch(baseURL + path, {method:'GET'})
+    .then(res=>{
+        if (!res.ok) throw new Error('HTTP error, stats: ', res.status);
+        return res.json();
+    })
+    .catch(err=>{
+        console.error(err);
+        alert('Something went wrong fetching from https://deckofcardsapi.com');
+    });
+}
+
+function getNewDeck(count = 1, shuffle = true) {
+    return fetchFromAPI(`/new/${shuffle?'shuffle/':''}${count?'?count='+count:''}`);
+}
+
+function drawCards(count = 1) {
+    return fetchFromAPI(`${deckID}/draw/?count=${count}`);
+}
+
+/**
+ * 
+ * @param {Boolean} [remaining=true] - Adding the remaining=true parameter will only shuffle those cards
+ * remaining in the main stack, leaving any piles or drawn cards alone.
+ * @link https://deckofcardsapi.com/#reshuffle
+ */
+function shuffleDeck(remaining = true) {
+    fetchFromAPI(`${deckID}/shuffle/${remaining?'?remaining=true':''}`);
+}
+
+function returnCards(cardList) {
+    return fetchFromAPI(`${deckID}/return/${cardList?`?cards=${cardList.join(',')}`:''}`);
+}
