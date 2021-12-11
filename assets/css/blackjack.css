@@ -1,6 +1,4 @@
 :root {
-    --header-height: 55px;
-    --footer-height: 90px;
     --player-action-bar-height: 4rem;
 
     --bet-area-gap: 2rem;
@@ -40,30 +38,6 @@ body {
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
-/* Header style */
-header {
-    position: fixed;
-    width: 100%;
-    height: var(--header-height);
-
-    display: none;
-}
-
-header > * {
-    float: right;
-    line-height: var(--header-height);
-}
-
-/* Footer style */
-footer {
-    position: fixed;
-    width: 100%;
-    height: var(--footer-height);
-    bottom: 0;
-
-    display: none;
-}
-
 /* Main game */
 
 main {
@@ -91,6 +65,23 @@ main {
     color: var(--general-text-color);
 }
 
+
+#dealer {
+    display: flex;
+	flex-direction: column;
+	justify-content: center;
+    align-items: center;
+    min-width: fit-content;
+    width: 50%;
+    height: calc(100% / 2);
+    margin: auto;
+}
+
+#dealer > .card-list {
+    height: var(--playing-card-height);
+}
+
+/* play area */
 #player-cash {
     font-size: 2rem;
     text-align: center;
@@ -116,22 +107,6 @@ main {
     line-height: var(--player-action-bar-height);
 }
 
-#dealer {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-    align-items: center;
-    min-width: fit-content;
-    width: 50%;
-    height: calc(100% / 2);
-    margin: auto;
-}
-
-#dealer > .card-list {
-    height: var(--playing-card-height);
-}
-
-/* play area */
 #betting-area {
     height: calc(100% / 2);
     overflow-y: auto;
@@ -159,7 +134,7 @@ main {
 .betting-box:first-child {
     margin-left: 0;
 
-    border-bottom-left-radius: 2.5rem; 
+    border-bottom-left-radius: 2.5rem;
 }
 
 .betting-box:last-child {
