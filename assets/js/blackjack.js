@@ -318,6 +318,7 @@ function dealerResponse(isWin) {
 function initDealerTurn() {
     document.getElementById('player-action').removeEventListener('click', handlePlayerAction)
     flipDealerCard(document.getElementById('dealer'))
+    setTimeout(dealerDecision.bind(null, document.getElementById('dealer')), DEALING_TIMEOUT)
 }
 
 function flipDealerCard(dealerBox) {
@@ -333,8 +334,6 @@ function flipDealerCard(dealerBox) {
     })
 
     updateCardsGameValue(dealerBox)
-
-    dealerDecision(dealerBox)
 }
 
 /**
@@ -348,10 +347,10 @@ function dealerDecision(dealerBox) {
             gameState.betBoxes.get(dealerBox).push(card)
             addCardImage(dealerBox, card)
             updateCardsGameValue(dealerBox)
-            dealerDecision(dealerBox)
+            setTimeout(dealerDecision.bind(null,dealerBox))
         })
     } else {
-        initConclusion(dealerBox)
+        setTimeout(initConclusion.bind(null,dealerBox))
     }
 }
 
@@ -359,8 +358,22 @@ function initConclusion(dealerBox) {
     gameState.continuePhase()
 
     const dealerValue = gameState.betBoxes.get(dealerBox).cardsValue()
-    
-    for (const betBox of getPlayBoxesDirection().values()) {
+
+    const betBoxes = getPlayBoxesDirection().values()
+
+    conclude()
+
+    showDealerMsg()
+
+    function conclude () {
+        const iteration = betBoxes.next()
+        if (iteration.done) {
+            resetGame()
+            return
+        }
+
+        const betBox = iteration.value
+
         const playerValue = gameState.betBoxes.get(betBox).cardsValue()
         if (playerValue > BLACKJACK) {
             concludeBet(betBox,'lose')
@@ -373,21 +386,23 @@ function initConclusion(dealerBox) {
         } else {
             concludeBet(betBox,'lose')
         }
-    }
 
-    resetGame()
+        setTimeout(conclude, DEALER_MSG_TIMEOUT)
+    }
 }
 
 function concludeBet(betBox, status) {
     const player = gameState.player
+    const dealerMsgElem = document.getElementById('dealer-message')
     if (status === 'win') {
         player.cash += player.getPot(betBox) * 2
-        return
-    }
-    if (status === 'draw') {
+    } else if (status === 'draw') {
         player.cash += player.getPot(betBox)
-        return
     }
+    
+
+    dealerMsgElem.innerText = status
+    dealerMsgEmphasize()
     // will clear pot list
 }
 

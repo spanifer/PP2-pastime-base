@@ -19,6 +19,7 @@
     1. when dealing
     1. when draws a card
     1. when dealer draws own cards
+1. Highlight active betbox
 1. Pause menu modal? what is pause?
 1. Out of cash?
 1. Add meta tags
