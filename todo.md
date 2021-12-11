@@ -1,17 +1,4 @@
-# Strategy
-
--   ## Definition
-    - A simple visually appealing site about one single blackjack game or multiple easy to implement games like memory flip card game, or more advanced like a platformer, like dino-run and such
-    - Demographic is for all who are willing to pastime
-    - Blackjack as minimum viable product with html,css,js, and a `not fully realized` canvas based "game"
-
--   ## Value
-    - For a user to take a break and relax throughout a hard day, have an engaging but not frustrating short experience of interactive games.
-    - Interactive elements and animation is the main appeal
-
--   ## [Research](#blackjack)
-        
--   ## Viability in implementation priority order
+# Viability in implementation priority order
     Opportunity / Problem | Importance | Feasibility | Status
     --- | --- | --- | ---
     BlackJack game core | 5 | 5 | ✔
@@ -28,11 +15,14 @@
     - 33 - 26
 
 1. Add facedown card
-1. Add image on load
-1. Game phase timing
+1. Add image on load & Game phase timing
+    1. when dealing
+    1. when draws a card
+    1. when dealer draws own cards
 1. Pause menu modal? what is pause?
 1. Out of cash?
 1. Add meta tags
+1. Card dealing animation as it flies over the table?
 
 # Main Idea
 ## Website

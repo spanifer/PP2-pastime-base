@@ -22,6 +22,7 @@ const MAX_BET = 100,
     BLACKJACK = 21,
     DEALER_MSG_TIMEOUT = 2000,
     TOGGLE_MSG_INTERVAL = 300,
+    DEALING_TIMEOUT = 500,
     BACK_OF_CARD_PATH = 'assets/images/back-of-card-small.jpg';
 
 const gameState = {
@@ -125,36 +126,53 @@ function getPlayBoxesDirection() {
 }
 
 function dealCards(docAPI) {
-    // The dealer deals from their left ("first base") to their far right ("third base")
+
     const betBoxes = getPlayBoxesDirection()
-    // Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single
-    // card to the dealer, followed by an additional card to each of the positions in play.
+
     betBoxes.push(document.getElementById('dealer'))
 
     const cards = docAPI.cards
-    
-    for (let i = 0; i < cards.length-1; i++) {
+
+    const cardIter = cards.entries()
+
+    dealNextCard()
+
+    function dealNextCard() {
+
+        const [i, card] = cardIter.next().value
+        if (i === docAPI.cards.length - 1) {
+            dealerFaceDownCard()
+            return
+        }
+
         const betBox = betBoxes[i % betBoxes.length]
-        addCardImage(betBox, cards[i])
+        addCardImage(betBox, card)
         
         let boxState
         if (boxState = gameState.betBoxes.get(betBox)) 
-            boxState.push(cards[i])
+            boxState.push(card)
         else
         throw new TypeError('Bet box does not exist!')
         
         updateCardsGameValue(betBox)
+
+        setTimeout(dealNextCard,DEALING_TIMEOUT)
+
     }
 
-    // dealer last card face-down
-    const betBox = betBoxes[betBoxes.length-1]
-    const div = document.createElement('div')
-    div.classList.add('two-faced', 'playing-card')
-    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" class="face-down"  alt="The back side of a card">`
+    function dealerFaceDownCard() {
 
-    betBox.getElementsByClassName('card-list')[0].appendChild(div)
+        // dealer last card face-down
+        const betBox = betBoxes[betBoxes.length-1]
+        const div = document.createElement('div')
+        div.classList.add('two-faced', 'playing-card')
+        div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" class="face-down"  alt="The back side of a card">`
 
-    gameState.dealerFaceDownCard = cards[cards.length-1]
+        betBox.getElementsByClassName('card-list')[0].appendChild(div)
+
+        gameState.dealerFaceDownCard = cards[cards.length-1]
+
+    }
 }
     
 function initEvaluationPhase() {
