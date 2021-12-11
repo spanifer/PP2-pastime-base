@@ -148,8 +148,9 @@ function dealCards(docAPI) {
 
     // dealer last card face-down
     const betBox = betBoxes[betBoxes.length-1]
-    const div = document.createElement('span')
-    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" id="face-down">`
+    const div = document.createElement('div')
+    div.classList.add('two-faced', 'playing-card')
+    div.innerHTML = `<img src="${BACK_OF_CARD_PATH}" class="face-down"  alt="The back side of a card">`
 
     betBox.getElementsByClassName('card-list')[0].appendChild(div)
 
@@ -305,12 +306,12 @@ function flipDealerCard(dealerBox) {
     const dealerCards = gameState.betBoxes.get(dealerBox)
     dealerCards.push(gameState.dealerFaceDownCard)
 
-    const imgWrapper = dealerBox.getElementsByTagName('span')[0]
+    const imgWrapper = dealerBox.getElementsByClassName('two-faced')[0]
 
-    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" id="face-up" alt="The back side of a card">`
+    imgWrapper.innerHTML += `<img src="${gameState.dealerFaceDownCard.image}" class="face-up">`
 
-    document.getElementById('face-up').addEventListener('load', ()=>{
-        dealerBox.querySelectorAll('span > img').forEach(card=>card.classList.toggle('flip'))
+    imgWrapper.getElementsByClassName('face-up')[0].addEventListener('load', ()=>{
+        [...imgWrapper.children].forEach(card=>card.classList.toggle('flip'))
     })
 
     updateCardsGameValue(dealerBox)

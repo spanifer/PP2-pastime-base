@@ -27,6 +27,13 @@
 
     - 33 - 26
 
+1. Add facedown card
+1. Add image on load
+1. Game phase timing
+1. Pause menu modal? what is pause?
+1. Out of cash?
+1. Add meta tags
+
 # Main Idea
 ## Website
 - each game should have its own high score board if applicable, saved on local storage, with whatever username and date
@@ -42,65 +49,3 @@
 
 - the site can have a get in contact page, or report error
     - Or the contact page could contain frequently asked questions ...
-
-# Games
--   ## BlackJack
-    rules and ui to implement in this order of importance
-    - [52-card deck](https://en.wikipedia.org/wiki/Standard_52-card_deck)
-        1. clubs (♣), diamonds (♦), hearts (♥) and spades (♠)? in svg?
-        1. generate the cards or have image assets? and the Ace, King, Queen, Jack image?
-        1. the back of the card generic pattern or follow the page color and design?
-        1. table background? audio?
-    - General [BlackJack RULES](https://en.wikipedia.org/wiki/Blackjack)
-    - User should play against the bank. Should the bank have a difficulty setting? Or should it be the source of dopamine?
-        - Hmmm, now the idea arise to implement a future where the game is not random, as soon as you start to lose (or have some chance to be nice?). That is something that me personally have never experienced so I find the idea fascinating. Maybe, Probably. To clarify it would activate when whatever player (thinking about multiplayer, or multiple npc?) is about to lose it last stake / that also mean a stake should be limited to an amount
-    - Should the game state be stored in local to be able to continue? or in query?
-    - Bank should have Speech Bubbles, win lose comments and such, inspiring or funny comments
-    - User should could have chat options to say on win or lose
-    - Every day if a user starts the game should receive X amount of cash on top of what he have to stake.
-    - Every time a user runs out of cash can only receive a small amount to stake again DAILY_GAME_TOKEN^(1/7) - ish
-    - Timeout on multiplayer?
-
-    - ### Game Phases
-        - #### Round cycles:
-            1. betting phase
-                - At a blackjack table, the dealer faces five to nine playing positions from behind a semicircular table.
-                - Between one and eight standard 52-card decks are shuffled together.
-                - To start each round, players place bets in the "betting box" at each position.
-                - The player whose bet is at the front of the betting box controls the position, and the dealer consults the controlling player for playing decisions; the other bettors "play behind".
-                - A player can usually control or bet in as many boxes as desired at a single table, players are limited to playing one to three positions at a table.
-            1. dealing phase
-                - The dealer deals from their left ("first base") to their far right ("third base").
-                - Each box gets an initial hand of two cards visible to the people playing on it.
-                - The dealer's hand gets its first card face up, and, in "hole card" games, immediately gets a second card face down (the hole card), which the dealer peeks at but only reveals when it makes the dealer's hand a blackjack.
-                - Dealers deal the cards from one or two handheld decks, from a dealer's shoe, or from a shuffling machine.
-                - Single cards are dealt to each wagered-on position clockwise from the dealer's left, followed by a single card to the dealer, followed by an additional card to each of the positions in play.
-                - The players' initial cards may be dealt face up or face down (more common in single-deck games).
-            1. evaluation phase / cycle
-                - Player Decisions; After the initial two cards, the player has up to five options:
-                    1. **Hit**: Take another card.
-                    1. **Stand**: Take no more cards.
-                    1. **Double down**: Increase the initial bet by 100% and take exactly one more card.
-                    1. **Split**: Create two hands from a starting hand where both cards are the same value. Each new hand gets another card so that the player has two starting hands. This requires an additional bet on the second hand. The two hands are played out independently, and the wager on each hand is won or lost independently. In the case of cards worth 10 points, some casinos only allow splitting when the cards are the same rank. For example, 10-10 could be split, but K-10 could not. Doubling and re-splitting after splitting are often restricted. A 10-valued card and an ace resulting from a split usually isn't considered a blackjack. Hitting split aces is often not allowed. Non-controlling players can opt to put up a second bet or not. If they do not, they only get paid or lose on one of the two post-split hands.
-                    1. **Surrender**: Forfeit half the bet and end the hand immediately. This option is only available at some tables in some casinos, and the option is only available as the first decision.
-            - ##### ~~Insurance~~ 
-                If the dealer shows an ace, an "insurance" bet is allowed. Insurance is a side bet that the dealer has a blackjack. The dealer asks for insurance bets before the first player plays. Insurance bets of half the player's current bet are placed on the "insurance bar" above player's cards. If the dealer has a blackjack, insurance pays 2 to 1. In most casinos, the dealer looks at the down card and pays off or takes the insurance bet immediately. In other casinos, the payoff waits until the end of the play.
-
-                In face-down games, if a player has more than one hand, they are allowed to look at all their hands before deciding. This is the only condition where a player can look at multiple hands.
-
-                Players with blackjack can also take insurance.
-
-                Insurance bets lose money in the long run. The dealer has a blackjack less than one-third of the time. Players can also take insurance when a 10-valued card shows, but the dealer has an ace in the hole less than one-tenth of the time.
-
-                The insurance bet is susceptible to advantage play. It is advantageous to make an insurance bet whenever the hole card has more than a one in three chance of being a ten. Card counting techniques can identify such situations.
-    - ### CSS styling
-        1. Elements positioning
-        1. Responsive elements
-        1. Button feedback, highlight active betBox
-        1. Header and footer shows in modal?
-
-    - ### Game phase timing
-
-    - ### Focusable input elements
-
-    - ### Accessibility

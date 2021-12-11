@@ -174,13 +174,13 @@ main {
     width: 100%;
 }
 
-.card-list>span {
+.two-faced {
     position: relative;
     display: inline-block;
     width: var(--playing-card-width);
 }
 
-.playing-card, .card-list>span {
+.playing-card, .two-faced {
     min-width: calc(var(--playing-card-width) / 6);
     height: var(--playing-card-height);
 }
@@ -228,7 +228,7 @@ main {
     color:var(--general-text-color);
 }
 
-#face-down {
+.face-down {
     position: absolute;
     display: inline-block;
     border-radius: 4%;
@@ -237,7 +237,7 @@ main {
     transition: transform .5s;
 }
 
-#face-up {
+.face-up {
     position: absolute;
     backface-visibility: hidden;
     transform: rotateY(180deg);
@@ -247,11 +247,11 @@ main {
 /* flip solution from https://moirahartigan.github.io/Portfolio-2---Alien-Memory-Game/index.html */
 /* and that from https://marina-ferreira.github.io/tutorials/js/memory-game/ */
 
-#face-up.flip {
+.face-up.flip {
     transform: rotateY(0deg);
 }
 
-#face-down.flip {
+.face-down.flip {
     transform: rotateY(180deg);
 }
 
